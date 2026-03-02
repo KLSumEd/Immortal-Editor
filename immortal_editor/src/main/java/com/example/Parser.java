@@ -34,12 +34,13 @@ public class Parser
     {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
+
         System.out.println("Welcome to the ImmortalScript Parser!");
         for (;;) 
         { 
             System.out.print("> ");
             String line = reader.readLine();
-            if (line == null) break;
+            if (line.equals("\u0004")) { break; }
             run(line);
             hadError = false;
         }
@@ -62,12 +63,4 @@ public class Parser
         hadError = true;
     }
 
-}
-
-
-
-class AbstractSyntaxTree
-{
-    public AbstractSyntaxTree() {}
-    
 }
