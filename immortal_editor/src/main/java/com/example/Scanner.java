@@ -47,13 +47,7 @@ class Scanner
             case '=' -> addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
             case '<' -> addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
             case '>' -> addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
-            case '/' -> {
-                if (match('/')) 
-                {
-                    // A comment goes until the end of the line.
-                    while (peek() != '\n' && !isAtEnd()) {advance();}
-                } else {addToken(TokenType.SLASH);}
-            }
+            case '/' -> caseComment();
             case '"' -> {
                 // Check for multiline string
                 if (match('"', 2)) {caseMultiline();}
@@ -63,7 +57,10 @@ class Scanner
             case '\r' -> {}
             case '\t' -> {}
             case ' ' -> {}
-            default -> {Parser.error(this.line, "Unexpected character.");}
+            default -> {
+                if (CharacterRangeCollection.VALID.inCharRanges(c)) {scanDefault();}
+                else {Parser.error(this.line, "Unexpected character.");}
+            }
         }
     }
 
@@ -84,7 +81,7 @@ class Scanner
         } 
 
         if (!isTerminated) { Parser.error(this.line, "Unterminated String."); } 
-        else { addToken(TokenType.STRING, s); }
+        else { addToken(TokenType.STR, s); }
     }
 
     // Runs when Lexeme begins with: """
@@ -113,9 +110,105 @@ class Scanner
 
         // EOF Error handling
         if (!isTerminated) { Parser.error(this.line, "Unterminated Multi-line String."); }
-        else { addToken(TokenType.STRING, s); }
+        else { addToken(TokenType.STR, s); }
     }
 
+
+    // Runs when Lexeme begins with: /
+    private void caseComment()
+    {
+        if (match('/')) 
+        {
+            // A comment goes until the end of the line.
+            while (!isAtEnd() && peek() != '\n') {advance();}
+        } else if (match('*'))
+        {
+            // Comment goes until '*/' token
+            char prevChar = '/', curChar = '*';
+            while (!isAtEnd() && (prevChar != '*' || curChar != '/'))
+            {
+                prevChar = curChar;
+                curChar = advance();
+            }
+        } else {addToken(TokenType.SLASH);}
+    }
+    
+
+
+    /// Case Default ///
+    
+    private enum ScanState {UNKNOWN, ID, INT, FLOAT, END, ERROR}
+    
+    private void scanDefault()
+    {
+        this.current--;
+        
+        if (!scanReservedWord())
+        {
+            ScanState state = ScanState.UNKNOWN, prevState = state;
+
+            while (!isAtEnd())
+            {
+                char c = peek();
+                state = calcState(state, c);
+                if (state == ScanState.END || state == ScanState.ERROR) { break; } 
+                else { this.current++; prevState = state; }
+            }
+
+            if (state == ScanState.ERROR) { Parser.error(this.line, "Unrecognised literal pattern.");}
+            prevState = prevState == ScanState.UNKNOWN ? state : prevState;
+            switch (prevState)
+            {
+                case ScanState.ID -> addToken(TokenType.IDENTIFIER); 
+                case ScanState.INT -> addToken(TokenType.INT);
+                case ScanState.FLOAT -> addToken(TokenType.FLOAT);
+                default -> Parser.error(this.line, "Unable to tokenize unrecognised literal.");
+            }
+        }
+    }
+
+    private boolean scanReservedWord()
+    {
+        boolean found = false;
+        
+        for (ReservedWords en : ReservedWords.values()) {
+            if (match(en.getLexeme()))
+            {
+                addToken(en.getTokenType());
+                found = true;
+                break;
+            }            
+        }
+
+        return found;
+    }
+
+
+    private ScanState calcState(ScanState state, char c)
+    {
+        ScanState newState = ScanState.END;
+        switch (state)
+        {
+            case ScanState.UNKNOWN -> {
+                if (CharacterRangeCollection.ID_FIRST.inCharRanges(c)) { newState = ScanState.ID; }
+                else if (CharacterRangeCollection.NUM.inCharRanges(c)) { newState = ScanState.INT; }
+            }
+            case ScanState.ID -> {
+                if (CharacterRangeCollection.ID.inCharRanges(c)) { newState = ScanState.ID; }
+            }
+            case ScanState.INT -> {
+                if (c == '.') { newState = ScanState.FLOAT; }
+                else if (CharacterRangeCollection.NUM.inCharRanges(c)) { newState = ScanState.INT; }
+                else if (CharacterRangeCollection.ID.inCharRanges(c)) { newState = ScanState.ERROR; }
+            }
+            case ScanState.FLOAT -> {
+                if (CharacterRangeCollection.NUM.inCharRanges(c)) { newState = ScanState.FLOAT; }
+                else if (CharacterRangeCollection.ID.inCharRanges(c)) { newState = ScanState.ERROR; }
+            }
+            default -> {}
+        }
+        return newState;
+    }
 
     ///// STRING PARSING /////
     
@@ -137,7 +230,7 @@ class Scanner
                 case '0' -> result = '\0';
                 case 'u' -> {
                     final int CODE_LEN = 4;
-                    final Pattern UTF8_PATTERN = Pattern.compile("[0-9a-f]{%d}".formatted(CODE_LEN));
+                    final Pattern UTF8_PATTERN = Pattern.compile("[\\da-f]{%d}".formatted(CODE_LEN));
                     if (peekFind(UTF8_PATTERN, CODE_LEN)) 
                     {
                         final String codeStr = advance(CODE_LEN); 
@@ -154,6 +247,7 @@ class Scanner
         return result;
     }
 
+    
 
     ///// HELPER METHODS /////
 
@@ -187,6 +281,19 @@ class Scanner
     // Default wrapper for match() with repeated = 1
     private boolean match(char expected) { return match(expected, 1); }
 
+    // Match for string pattern
+    private boolean match(String expected)
+    {
+        final int len_expected = expected.length();
+        for (int i = 0; i < len_expected; i++)
+        {
+            if (peekIndex(this.current + i) != expected.charAt(i)) { return false; }
+        }
+
+        this.current += len_expected;
+        return true;
+    }
+
 
     /// Peeking ///
     private char peekIndex(int index)
@@ -217,12 +324,22 @@ class Scanner
         if (isIndexAtEnd(this.current + dist)) {return false;}
         else 
         {
-            final String s = peekMode ? peek(dist) : advance(dist);
-            final Matcher m = pattern.matcher(s);
-            return m.find();
+            final String S = peekMode ? peek(dist) : advance(dist);
+            final Matcher M = pattern.matcher(S);
+            return M.find();
         }
     }
 
+    @SuppressWarnings("unused") // TODO: Remove
+    private ArrayList<String> getMatches(Pattern pattern, String source)
+    {
+        final Matcher M = pattern.matcher(source);
+        ArrayList<String> matches = new ArrayList<>();
+        while (M.find()) {matches.add(M.group());}
+        return matches;
+    }
+    
+    @SuppressWarnings("unused") // TODO: Remove
     private boolean matchFind(Pattern pattern, int dist) { return findPattern(false, pattern, dist); }
 
     private boolean peekFind(Pattern pattern, int dist) { return findPattern(true, pattern, dist); }

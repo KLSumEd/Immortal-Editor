@@ -14,15 +14,17 @@ public enum TokenType
     LESS, LESS_EQUAL,
 
     // Literals
-    IDENTIFIER, STRING, NUMBER,
+    IDENTIFIER, STR,
+    INT, FLOAT, 
+    TRUE, FALSE,
 
     // Keywords
-    AND, OR, IF, ELSE, TRUE, FALSE,
-    RETURN, CLASS, SUPER, THIS, 
-    FOR, WHILE, ENUM,
+    AND, OR, NOT, IF, ELSE,
+    CLASS, SUPER, THIS, 
+    FOR, WHILE, ENUM, FUNC, RETURN,
 
     // Type Keywords
-    STR, INT, FLOAT, BOOL,
+    KW_STR, KW_INT, KW_FLOAT, KW_BOOL,
     
     EOF
 }
