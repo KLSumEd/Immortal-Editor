@@ -1,4 +1,4 @@
-package com.example;
+package com.immortal;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class Parser
     {
         if (args.length > 1) 
         {
-            System.out.println("Usage: jlox [script]");
+            System.out.println("Usage: ImmortalScript [script]");
             System.exit(64); 
         } else if (args.length == 1) {runFile(args[0]);} 
         else {runPrompt();}

@@ -1,4 +1,4 @@
-package com.example;
+package com.immortal;
 
 public enum TokenType 
 {

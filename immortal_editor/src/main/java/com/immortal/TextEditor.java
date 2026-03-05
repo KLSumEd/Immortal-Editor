@@ -1,4 +1,4 @@
-package com.example;
+package com.immortal;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;

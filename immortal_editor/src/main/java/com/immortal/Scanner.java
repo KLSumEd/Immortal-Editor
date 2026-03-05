@@ -1,4 +1,4 @@
-package com.example;
+package com.immortal;
 
 import java.util.ArrayList;
 import java.util.List;

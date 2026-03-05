@@ -1,4 +1,4 @@
-package com.example;
+package com.immortal;
 
 public enum ReservedWords {
     TRUE("true", TokenType.TRUE),
