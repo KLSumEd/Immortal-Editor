@@ -48,7 +48,7 @@ public class Parser
 
     private static void run(String source) 
     {
-        Scanner scanner = new Scanner(source);
+        _Scanner scanner = new _Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
         // For now, just print the tokens.
