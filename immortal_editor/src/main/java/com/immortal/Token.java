@@ -1,23 +1,22 @@
 package com.immortal;
 
-public class Token 
+public class Token
 {
     private final TokenType type;
-    private final String lexeme;
-    private final Object literal;
+    private final int line;
 
-    public Token(TokenType type, String lexeme, Object literal, int line) 
+    public Token(TokenType type, int line) 
     {
         this.type = type;
-        this.lexeme = lexeme;
-        this.literal = literal;
+        this.line = line;
     }
 
-    @Override
-    public String toString() 
+    @Override public String toString() 
     {
-        return this.type + " " + this.lexeme + " " + this.literal;
+        return this.type.toString() + " " + this.type.getLexeme() + " " + this.line;
     }
 
-    public String getLexeme() {return this.lexeme; }
+    protected String getLexeme() { return this.type.getLexeme(); }
+    protected TokenType getType() { return this.type; }
+    protected int getLine() { return this.line; }
 }

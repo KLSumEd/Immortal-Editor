@@ -1,7 +1,5 @@
 package com.immortal;
 
-import java.util.List;
-
 public class SingleCharLexer extends Lexer
 {
 
@@ -16,14 +14,14 @@ public class SingleCharLexer extends Lexer
     }
 
     // TODO: 06/03/26 16:10 - Move into new class to follow SRP
-    private boolean checkLexeme(String lexeme, List<Token> tokenList)
-    {
-        boolean isValid = false;
-        for (Token token : tokenList)
-        {
-            if (lexeme.equals(token.getLexeme())) { isValid = true; }
-        }
+    // private boolean checkLexeme(String lexeme, List<Token> tokenList)
+    // {
+    //     boolean isValid = false;
+    //     for (Token token : tokenList)
+    //     {
+    //         if (lexeme.equals(token.getLexeme())) { isValid = true; }
+    //     }
 
-        return isValid;
-    }
+    //     return isValid;
+    // }
 }

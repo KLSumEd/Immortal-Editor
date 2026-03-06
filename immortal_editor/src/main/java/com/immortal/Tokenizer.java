@@ -11,5 +11,7 @@ public abstract class Tokenizer
         this.tokenList = newTokenList;
     }
 
-    public List<Token> getTokenList() { return this.tokenList; }
+    public abstract void tokenize();
+
+    protected List<Token> getTokenList() { return this.tokenList; }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 class _Scanner 
 {
     private final String source;
@@ -24,7 +25,7 @@ class _Scanner
             scanToken();
         }
 
-        this.tokens.add(new Token(TokenType.EOF, "", null, this.line));
+        this.tokens.add(new Token(SingleCharTokenType.EOF, this.line));
         return this.tokens;
     }
 
@@ -33,20 +34,20 @@ class _Scanner
         char c = advance();
         switch (c) 
         {
-            case '(' -> addToken(TokenType.LEFT_PAREN);
-            case ')' -> addToken(TokenType.RIGHT_PAREN);
-            case '{' -> addToken(TokenType.LEFT_BRACE);
-            case '}' -> addToken(TokenType.RIGHT_BRACE);
-            case ',' -> addToken(TokenType.COMMA);
-            case '.' -> addToken(TokenType.DOT);
-            case '-' -> addToken(TokenType.MINUS);
-            case '+' -> addToken(TokenType.PLUS);
-            case ';' -> addToken(TokenType.SEMICOLON);
-            case '*' -> addToken(TokenType.STAR);
-            case '!' -> addToken(match('=') ? TokenType.EXCL_EQUAL : TokenType.EXCL);
-            case '=' -> addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
-            case '<' -> addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
-            case '>' -> addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+            case '(' -> addToken(SingleCharTokenType.LEFT_PAREN);
+            case ')' -> addToken(SingleCharTokenType.RIGHT_PAREN);
+            case '{' -> addToken(SingleCharTokenType.LEFT_BRACE);
+            case '}' -> addToken(SingleCharTokenType.RIGHT_BRACE);
+            case ',' -> addToken(SingleCharTokenType.COMMA);
+            case '.' -> addToken(SingleCharTokenType.DOT);
+            case '-' -> addToken(SingleCharTokenType.MINUS);
+            case '+' -> addToken(SingleCharTokenType.PLUS);
+            case ';' -> addToken(SingleCharTokenType.SEMICOLON);
+            case '*' -> addToken(SingleCharTokenType.STAR);
+            case '!' -> addToken(match('=') ? SingleDoubleCharTokenType.EXCL_EQUAL : SingleDoubleCharTokenType.EXCL);
+            case '=' -> addToken(match('=') ? SingleDoubleCharTokenType.EQUAL_EQUAL : SingleDoubleCharTokenType.EQUAL);
+            case '<' -> addToken(match('=') ? SingleDoubleCharTokenType.LESS_EQUAL : SingleDoubleCharTokenType.LESS);
+            case '>' -> addToken(match('=') ? SingleDoubleCharTokenType.GREATER_EQUAL : SingleDoubleCharTokenType.GREATER);
             case '/' -> caseComment();
             case '"' -> {
                 // Check for multiline string
@@ -81,7 +82,7 @@ class _Scanner
         } 
 
         if (!isTerminated) { Parser.error(this.line, "Unterminated String."); } 
-        else { addToken(TokenType.STR, s); }
+        else { addToken(IdentifierLiteralTokenType.STR, s); }
     }
 
     // Runs when Lexeme begins with: """
@@ -110,7 +111,7 @@ class _Scanner
 
         // EOF Error handling
         if (!isTerminated) { Parser.error(this.line, "Unterminated Multi-line String."); }
-        else { addToken(TokenType.STR, s); }
+        else { addToken(IdentifierLiteralTokenType.STR, s); }
     }
 
 
@@ -130,7 +131,7 @@ class _Scanner
                 prevChar = curChar;
                 curChar = advance();
             }
-        } else {addToken(TokenType.SLASH);}
+        } else {addToken(SingleCharTokenType.SLASH);}
     }
     
 
@@ -159,9 +160,9 @@ class _Scanner
             prevState = prevState == ScanState.UNKNOWN ? state : prevState;
             switch (prevState)
             {
-                case ScanState.ID -> addToken(TokenType.IDENTIFIER); 
-                case ScanState.INT -> addToken(TokenType.INT);
-                case ScanState.FLOAT -> addToken(TokenType.FLOAT);
+                case ScanState.ID -> addToken(IdentifierLiteralTokenType.IDENTIFIER, null); 
+                case ScanState.INT -> addToken(IdentifierLiteralTokenType.IDENTIFIER, null);
+                case ScanState.FLOAT -> addToken(IdentifierLiteralTokenType.IDENTIFIER, null);
                 default -> Parser.error(this.line, "Unable to tokenize unrecognised literal.");
             }
         }
@@ -171,10 +172,10 @@ class _Scanner
     {
         boolean found = false;
         
-        for (ReservedWords en : ReservedWords.values()) {
+        for (ReservedWordsTokenType en : ReservedWordsTokenType.values()) {
             if (match(en.getLexeme()))
             {
-                addToken(en.getTokenType());
+                addToken(en);
                 found = true;
                 break;
             }            
@@ -330,7 +331,8 @@ class _Scanner
         }
     }
 
-    @SuppressWarnings("unused") // TODO: Remove
+
+    /* TODO: Remove immediately after copying to new class
     private ArrayList<String> getMatches(Pattern pattern, String source)
     {
         final Matcher M = pattern.matcher(source);
@@ -339,20 +341,19 @@ class _Scanner
         return matches;
     }
     
-    @SuppressWarnings("unused") // TODO: Remove
     private boolean matchFind(Pattern pattern, int dist) { return findPattern(false, pattern, dist); }
+    */
 
     private boolean peekFind(Pattern pattern, int dist) { return findPattern(true, pattern, dist); }
 
-
     /// Adding Tokens ///
-    private void addToken(TokenType type, Object literal) 
+    private void addToken(IdentifierLiteralTokenType type, Object literal) 
     {
         String text = this.source.substring(this.start, this.current);
-        tokens.add(new Token(type, text, literal, this.line));
+        tokens.add(new IdentifierLiteralToken(type, text, literal, this.line));
     }
     // Default wrapper for addToken() with: literal = null
-    private void addToken(TokenType type) {addToken(type, null);}
+    private void addToken(TokenType type) { this.tokens.add(new Token(type, this.line)); }
 
 
     /// EOF Checking ///
