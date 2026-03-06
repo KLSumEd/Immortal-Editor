@@ -1,6 +1,12 @@
 package com.immortal;
 
-public interface Lexer 
+public abstract class Lexer 
 {
-    public String generateLexeme();
+    private final Scanner scanner;
+    
+    public Lexer(Scanner scanner) { this.scanner = scanner; }
+    
+    protected abstract String generateLexeme();
+
+    protected Scanner getScanner() { return this.scanner; }
 }
