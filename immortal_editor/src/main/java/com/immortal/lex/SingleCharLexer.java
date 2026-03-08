@@ -5,14 +5,16 @@ import com.immortal.scan.Scanner;
 public class SingleCharLexer extends Lexer
 {
 
-    public SingleCharLexer(Scanner scanner) 
+    public SingleCharLexer(Scanner scanner, LexChecker checker) 
     {
-        super(scanner);
+        super(scanner, checker);
     }
 
-    @Override protected String generateLexeme() 
+    @Override public String generateLexeme() 
     {
-        return String.valueOf(getScanner().advance());
+        String lexeme = String.valueOf(getScanner().advance());
+        lexeme = this.getLexChecker().checkLex(lexeme) ? lexeme : "";
+        return lexeme;
     }
 
     // TODO: 06/03/26 16:10 - Move into new class to follow SRP
