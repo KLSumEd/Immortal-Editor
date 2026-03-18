@@ -2,7 +2,7 @@ package com.immortal.tokens;
 
 import java.util.List;
 
-public abstract class Tokenizer
+public class Tokenizer
 {
     private final List<Token> tokenList;
 
@@ -11,7 +11,7 @@ public abstract class Tokenizer
         this.tokenList = newTokenList;
     }
 
-    public abstract void tokenize();
+    public void tokenize() {}
 
     protected List<Token> getTokenList() { return this.tokenList; }
 }

@@ -1,5 +1,6 @@
 package com.immortal.lex;
 
+import com.immortal.lex.checker.LexChecker;
 import com.immortal.scan.Scanner;
 
 public class IdentifierLiteralLexer extends Lexer
@@ -12,14 +13,16 @@ public class IdentifierLiteralLexer extends Lexer
         LexChecker checker = this.getLexChecker();
         String lexeme = "";
         int lengthCounter = 0;
+        int startingIndex = scanner.getIndex();
 
         while (checker.checkLex(lexeme))
         {
-            lexeme += scanner.peekIndex(scanner.getIndex() + lengthCounter);
+            lexeme += scanner.peekIndex(startingIndex + lengthCounter);
             lengthCounter++;
         }
 
-        lexeme = lexeme.substring(0, lengthCounter);
+        lexeme = lexeme.substring(0, lengthCounter - 1);
+        scanner.incrementIndex(lengthCounter);
         return lexeme;
     }
     

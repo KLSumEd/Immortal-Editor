@@ -9,8 +9,8 @@ public enum ReservedWordsTokenType implements TokenType
     FALSE("false"),
     STR("str"),           // For the following entries
     INT("int"),           // ensure the given TokenType
-    BOOL("bool"),        // refers to the TYPE IDENTIFIER TOKENS
-    FLOAT("float"),     // NOT the LITERAL TOKENS   
+    BOOL("bool"),         // refers to the TYPE IDENTIFIER TOKENS
+    FLOAT("float"),       // NOT the LITERAL TOKENS   
     FUNCTION("function"),   
     AND("and"),
     OR("or"),
@@ -28,7 +28,8 @@ public enum ReservedWordsTokenType implements TokenType
 
     private static final Set<String> LEXEME_SET;
 
-    static {
+    static 
+    {
         Set<String> lexSetBuilder = new HashSet<>();
         for (ReservedWordsTokenType tokenType : ReservedWordsTokenType.values())
         {
@@ -37,7 +38,7 @@ public enum ReservedWordsTokenType implements TokenType
         LEXEME_SET = Set.copyOf(lexSetBuilder);
     }
 
-    private ReservedWordsTokenType(String newLexeme) { this.lexeme = newLexeme; }
+    private ReservedWordsTokenType(String lexeme) { this.lexeme = lexeme; }
 
     @Override public String getLexeme() { return this.lexeme; }
     public static Set<String> getLexSet() { return LEXEME_SET; }

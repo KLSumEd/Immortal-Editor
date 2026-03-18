@@ -1,31 +1,40 @@
 package com.immortal.lex;
 
+import com.immortal.lex.checker.LexChecker;
+import com.immortal.lex.checker.SingleCharLexChecker;
 import com.immortal.scan.Scanner;
 
 public class SingleCharLexer extends Lexer
 {
-
-    public SingleCharLexer(Scanner scanner, LexChecker checker) 
+    public SingleCharLexer(Scanner scanner, SingleCharLexChecker checker) 
     {
         super(scanner, checker);
     }
 
     @Override public String generateLexeme() 
     {
-        String lexeme = String.valueOf(getScanner().advance());
-        lexeme = this.getLexChecker().checkLex(lexeme) ? lexeme : "";
+        Scanner scanner = this.getScanner();
+        LexChecker checker = this.getLexChecker();
+
+        String lexeme = "" + scanner.peek();
+        
+        for (int i = 0; i < 2; i++)
+        {
+            char c = scanner.peek();
+            if (c == '\0')
+            {
+                break;
+            }
+            else
+            {
+                lexeme += c;
+                if (checker.checkLex(lexeme))
+                {
+                    
+                }
+            }
+        }
+        
         return lexeme;
     }
-
-    // TODO: 06/03/26 16:10 - Move into new class to follow SRP
-    // private boolean checkLexeme(String lexeme, List<Token> tokenList)
-    // {
-    //     boolean isValid = false;
-    //     for (Token token : tokenList)
-    //     {
-    //         if (lexeme.equals(token.getLexeme())) { isValid = true; }
-    //     }
-
-    //     return isValid;
-    // }
 }

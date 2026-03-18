@@ -53,7 +53,7 @@ public class Parser
     {
         _Scanner scanner = new _Scanner(source);
         List<Token> tokens = scanner.scanTokens();
-
+        if (hadError) return;
         // For now, just print the tokens.
         for (Token token : tokens) {System.out.println(token);}
     }
@@ -62,7 +62,7 @@ public class Parser
 
     private static void report(int line, String where, String message) 
     {
-        System.err.println("[line " + line + "] Error" + where + ": " + message);
+        System.err.println("[line " + line + "] Error " + where + ": " + message);
         hadError = true;
     }
 

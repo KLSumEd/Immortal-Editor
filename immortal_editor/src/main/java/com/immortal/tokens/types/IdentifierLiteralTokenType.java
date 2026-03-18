@@ -17,12 +17,12 @@ public enum IdentifierLiteralTokenType implements TokenType
         this.helper = helper;
     }
 
-    @Override public String getLexeme() { return null; }
-    
     public CharRangeGroup getCharRangeGroup(String lexeme) 
     { 
         return this.helper.getCharRangeGroup(lexeme); 
     }
+
+    @Override public String getLexeme() { return null; }
 }
 
 interface IdentifierLiteralPatternChecker

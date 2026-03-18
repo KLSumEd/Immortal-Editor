@@ -1,4 +1,4 @@
-package com.immortal.lex;
+package com.immortal.lex.checker;
 
 public interface LexChecker 
 {
