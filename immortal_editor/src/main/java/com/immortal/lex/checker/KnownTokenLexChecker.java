@@ -2,8 +2,8 @@ package com.immortal.lex.checker;
 
 import java.util.List;
 
+import com.immortal.tokens.types.EnumListBuilder;
 import com.immortal.tokens.types.KnownLexTokenType;
-import com.immortal.tokens.types.KnownLexTokenTypeListBuilder;
 import com.immortal.tokens.types.SingleCharTokenType;
 import com.immortal.tokens.types.SingleDoubleCharTokenType;
 
@@ -18,7 +18,7 @@ public class KnownTokenLexChecker implements LexChecker
             SingleDoubleCharTokenType.class
         );
 
-        final List<KnownLexTokenType> tokenTypes = KnownLexTokenTypeListBuilder.buildFrom(tokenTypeEnumClassList);
+        final List<KnownLexTokenType> tokenTypes = EnumListBuilder.buildFrom(tokenTypeEnumClassList);
 
         TOKEN_TREE = new KnownTokenTree(tokenTypes);
     }

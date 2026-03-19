@@ -1,27 +1,26 @@
 package com.immortal.lex.checker;
 
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import com.immortal.tokens.types.KnownLexTokenType;
+import com.immortal.util.HashITree;
+import com.immortal.util.TreeRule;
 
-public class KnownTokenTree
+public class KnownTokenTree extends HashITree<String>
 {
-    private final TreeMap<String, KnownLexTokenType> tokenTree = new TreeMap<>();
+    private static final TreeRule<String> SORT_RULE = (String source, String target) -> {
+        int diff = source.compareTo(target);
+        return diff > 0;
+    };
 
     public KnownTokenTree(List<KnownLexTokenType> tokenList) 
     {
+        super(SORT_RULE);
+
         for (KnownLexTokenType tokenType : tokenList)
         {
             String lexeme = tokenType.getLexeme();
-            this.tokenTree.putIfAbsent(lexeme, tokenType);
+            addToken(lexeme);
         }
     }
-
-    public KnownLexTokenType get(String lexeme) { return this.tokenTree.get(lexeme); }
-    public boolean contains(String lexeme) { return this.tokenTree.containsKey(lexeme); }
-    
-    public Map<String, KnownLexTokenType> toMap() { return Map.copyOf(this.tokenTree); }
-    public TreeMap<String, KnownLexTokenType> toTreeMap() { return new TreeMap<>(this.toMap()); }
 }

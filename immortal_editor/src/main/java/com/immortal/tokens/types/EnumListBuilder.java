@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class KnownLexTokenTypeListBuilder
+public abstract class EnumListBuilder
 {
-    public static <T extends KnownLexTokenType> 
-      List<KnownLexTokenType> build(Class<? extends T> TTEnumClass) 
+    public static <T> 
+      List<T> build(Class<? extends T> TTEnumClass) 
         throws NullPointerException
     {
         T[] enumConstantsArray = TTEnumClass.getEnumConstants();
@@ -16,22 +16,22 @@ public abstract class KnownLexTokenTypeListBuilder
         if (enumConstantsArray == null) 
         { throw new NullPointerException("Enum Class cannot be null."); }
 
-        List<KnownLexTokenType> enumConstantsList = Arrays.asList(enumConstantsArray);
+        List<T> enumConstantsList = Arrays.asList(enumConstantsArray);
 
         return enumConstantsList;
     }
 
-    public static <T extends KnownLexTokenType> 
-      List<KnownLexTokenType> buildFrom(Collection<? extends Class<? extends T>> classCollection)
+    public static <T> List<T> 
+      buildFrom(Collection<Class<? extends T>> classCollection)
     {
-        final List<KnownLexTokenType> lexList = new ArrayList<>();
+        final List<T> lexList = new ArrayList<>();
 
         for (Class<? extends T> TTEnumClass : classCollection)
         {
             lexList.addAll(build(TTEnumClass));
         }
 
-        final List<KnownLexTokenType> result = List.copyOf(lexList);
+        final List<T> result = List.copyOf(lexList);
         return result;
     }
 
