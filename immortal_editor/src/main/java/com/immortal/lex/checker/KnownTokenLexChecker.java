@@ -1,32 +1,30 @@
 package com.immortal.lex.checker;
 
 import java.util.List;
-import java.util.Set;
 
-import com.immortal.lex.checker.util.KnownTokenLexCheckerSet;
-import com.immortal.lex.checker.util.KnownTokenLexCheckerSetBuilder;
-import com.immortal.tokens.types.KnownTokenLexTokenType;
+import com.immortal.tokens.types.KnownLexTokenType;
+import com.immortal.tokens.types.KnownLexTokenTypeListBuilder;
 import com.immortal.tokens.types.SingleCharTokenType;
 import com.immortal.tokens.types.SingleDoubleCharTokenType;
 
 public class KnownTokenLexChecker implements LexChecker
 {
-    private final Set<?> firstCharSet;
-    private final Set<?> lexSet;
+    private static final KnownTokenTree TOKEN_TREE;
 
-    // TODO: @KLSumEd - Make this class more generic | Due - 19/03/2026
-    // Is the tokenTypeClassList relevant/specific to this class?
-    // Is this class' functionality unique?
-
-    public KnownTokenLexChecker()
+    static 
     {
-        KnownTokenLexCheckerSetBuilder builder = new KnownTokenLexCheckerSetBuilder();
-        List<Class<? extends KnownTokenLexTokenType>> tokenTypeClassList = List.of(SingleCharTokenType.class, SingleDoubleCharTokenType.class);
-        KnownTokenLexCheckerSet knownLexCheckerSet = builder.build(tokenTypeClassList);
-        this.firstCharSet = knownLexCheckerSet.getFirstCharSet();
-        this.lexSet = knownLexCheckerSet.getLexSet();
+        final List<Class<? extends KnownLexTokenType>> tokenTypeEnumClassList = List.of(
+            SingleCharTokenType.class, 
+            SingleDoubleCharTokenType.class
+        );
+
+        final List<KnownLexTokenType> tokenTypes = KnownLexTokenTypeListBuilder.buildFrom(tokenTypeEnumClassList);
+
+        TOKEN_TREE = new KnownTokenTree(tokenTypes);
     }
 
-    @Override public boolean checkLex(String lexeme) { return this.lexSet.contains(lexeme); }
-    public boolean checkFirstChar(char firstChar) { return this.firstCharSet.contains(firstChar); }
+    @Override public boolean checkLex(String lexeme)
+    {
+        return TOKEN_TREE.contains(lexeme);
+    }
 }

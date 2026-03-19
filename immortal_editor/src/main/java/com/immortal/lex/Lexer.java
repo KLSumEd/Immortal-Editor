@@ -1,7 +1,5 @@
 package com.immortal.lex;
 
-import com.immortal.lex.checker.SingleCharLexChecker;
-import com.immortal.lex.checker.SingleDoubleCharLexChecker;
 import com.immortal.scan.Scanner;
 
 public abstract class Lexer 
@@ -15,38 +13,24 @@ public abstract class Lexer
 
     protected String lex()
     {
+        boolean isLexing = true;
         String result = "";
 
-
-        while (!this.scanner.isAtEnd())
+        while (isLexing)
         {
-            char c = this.scanner.peek();
-            result += c;
-            SingleCharLexChecker singleCharLexChecker = new SingleCharLexChecker();
-            SingleDoubleCharLexChecker singleDoubleCharLexChecker = new SingleDoubleCharLexChecker();
-            if (singleCharLexChecker.checkLex(result))
+            if (this.scanner.isAtEnd())
             {
-                
+                isLexing = false;
             }
-            else if (singleDoubleCharLexChecker.checkLex(result))
+            else
             {
-                finiteLookahead(c);
+                char c = this.scanner.peek();
+                result += c;
             }
-
         }
 
         return result;
     }
-
-    private void finiteLookahead(int dist) 
-    {
-        for (int i = 0; i < dist; i++)
-        {
-
-        }
-    }
-
-    protected Scanner getScanner() { return this.scanner; }
 
     protected static void error() { hadLexError = true; }
     public static boolean hasErrorOccurred() { return hadLexError; }
