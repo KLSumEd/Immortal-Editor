@@ -1,27 +1,15 @@
 package com.immortal.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-public class TreeNode<V>
+public interface TreeNode<V>
 {
-    private V value;
-    private TreeNode<V> parent;
-    private final List<TreeNode<V>> children;
-    
-    public TreeNode(V value, TreeNode<V> parent) 
-    { 
-        this.value = value; 
-        this.parent = parent;
-        this.children = new ArrayList<>();
-    }
+    public V getValue();
+    public void setValue(V value);
 
-    public V getValue() { return this.value; }
-    public void setValue(V value) { this.value = value; }
+    public TreeRule<V> getSortRule();
+    public Collection<V> getChildren();
 
-    public TreeNode<V> getParent() { return this.parent; }
-    public void setParent(TreeNode<V> parent) { this.parent = parent; }
-
-    public List<TreeNode<V>> getChildren() { return this.children; }
-    public void addChild(TreeNode<V> child) { this.children.add(child); }
+    // public V get(V target);
+    // public void add(V value);
 }

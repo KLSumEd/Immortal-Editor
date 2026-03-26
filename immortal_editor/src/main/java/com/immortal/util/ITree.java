@@ -2,7 +2,7 @@ package com.immortal.util;
 
 public interface ITree<V>
 {
-    public void addToken(V token);
+    public void put(V value);
     public boolean contains(V value);
     public TreeTraverser<V> createTraverser();
 
