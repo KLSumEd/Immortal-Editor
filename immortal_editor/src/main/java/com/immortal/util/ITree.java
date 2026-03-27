@@ -1,11 +1,13 @@
 package com.immortal.util;
 
+import java.util.Collection;
+
 public interface ITree<V>
 {
     public void put(V value);
+    public void remove(V value);
     public boolean contains(V value);
-    public TreeTraverser<V> createTraverser();
 
     public TreeRule<V> getSortRule();
-    public TreeNode<V> getRoot();
+    public Collection<TreeNode<V>> getRoots();
 }
