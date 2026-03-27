@@ -10,4 +10,5 @@ public interface ITree<V>
 
     public TreeRule<V> getSortRule();
     public Collection<TreeNode<V>> getRoots();
+    public int size();
 }

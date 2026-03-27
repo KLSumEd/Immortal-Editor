@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class HashITree<V> extends AbstractITree<V>
 {
@@ -74,27 +75,52 @@ public class HashITree<V> extends AbstractITree<V>
         
         if (nearestNodeValue != null) 
         { 
-            List<V> nodeChildren = new ArrayList<>();
-            for (V child : this.treeMap.get(nearestNodeValue).getChildren())
-            {
-                if (this.sortRule.execute(child, value)) nodeChildren.add(child);
+            Set<V> nodeChildren = new HashSet<>();
+            for (V child : this.treeMap.get(nearestNodeValue).getChildren()) 
+            { 
+                if (this.sortRule.execute(child, value)) nodeChildren.add(child); 
             }
+
             for (V newChild : nodeChildren)
             {
                 this.treeMap.get(nearestNodeValue).removeChild(newChild);
+                node.addChild(newChild);
             }
             this.treeMap.get(nearestNodeValue).addChild(value); 
         }
-        else { this.roots.add(value); }
+        else 
+        {
+            Set<V> nodeChildren = new HashSet<>();
+            for (V root : this.roots) { if (this.sortRule.execute(root, value)) nodeChildren.add(root); }
+            
+            for (V newChild : nodeChildren) 
+            { 
+                this.roots.remove(newChild);
+                node.addChild(newChild); 
+            }
+            this.roots.add(value);
+        }
         
         this.treeMap.put(value, node);
     }
 
     @Override public void remove(V value)
     {
-        V nearestNodeValue = traverse(value);
-        this.treeMap.get(nearestNodeValue).removeChild(value);
+        if (!this.treeMap.containsKey(value)) return;
+
+        Collection<V> targetChildren = this.treeMap.get(value).getChildren();
         this.treeMap.remove(value);
+        V nearestNodeValue = traverse(value);
+        
+        if (nearestNodeValue != null)
+        {
+            for (V child : targetChildren) { this.treeMap.get(nearestNodeValue).addChild(child); }
+        }
+        else
+        {
+            for (V child : targetChildren) { this.roots.add(child); }
+            this.roots.remove(value);
+        }
     }
 
     @Override public boolean contains(V target) { return this.treeMap.containsKey(target); }
@@ -107,49 +133,33 @@ public class HashITree<V> extends AbstractITree<V>
         return List.copyOf(rootNodes);
     }
 
-    private static <V> V depthFirst(HashMap<V, HashTreeNode<V>> map, V key)
+    @Override public String toString() { return recursiveToString(); }
+
+    private String recursiveToString(Collection<V> currentNodes, String prev, int depth)
     {
-        V currentKey = key;
-        boolean reachedBottom = !map.containsKey(currentKey);
+        String result = prev;
 
-        while (!reachedBottom)
+        for (V node : currentNodes)
         {
-            TreeNode<V> currentNode = map.get(currentKey);
+            for (int i = 0; i < depth; i++) { result += " "; }
 
-            List<V> children = new ArrayList<>();
-            for (V child : currentNode.getChildren())
-            {
-                if (map.containsKey(child)) children.add(child);
-            }
+            result += depth > 0 ? "| " + String.valueOf(node) : String.valueOf(node);
+            result += "\n";
 
-            if (children.isEmpty()) { reachedBottom = true; }
-            else currentKey = children.getFirst();
+            Collection<V> children = this.treeMap.get(node).getChildren();
+            if (!children.isEmpty()) { result = recursiveToString(children, result, depth + 1); }
         }
 
-        return currentKey;
-    }
-
-    @Override public String toString() 
-    {
-        String result = "";
-        HashMap<V, HashTreeNode<V>> readMap = new HashMap<>();
-        readMap.putAll(this.treeMap);
-
-        for (V key : this.roots)
-        {
-            boolean checkedRoot = false;
-            while (!checkedRoot)
-            {
-                V deepestNode = HashITree.<V>depthFirst(readMap, key);
-                readMap.remove(deepestNode);
-                result = deepestNode + ", " + result;
-                checkedRoot = deepestNode.equals(key);
-            }
-            result = "\n" + result;
-        }
-        result = result.substring(1);
         return result;
     }
+
+    public String recursiveToString()
+    {
+        String result = recursiveToString(this.roots, "", 0);
+        return result.substring(0, result.length()-1);
+    }
+
+    @Override public int size() { return this.treeMap.size(); }
 }
 
 
@@ -163,29 +173,6 @@ class HashTreeNode<V> extends AbstractTreeNode<V>
         this.children = new HashSet<>();
     }
 
-    // @Override public V get(V target)
-    // {
-    //     TreeNode<V> node = target.equals(this.value) ? this : null;
-        
-    //     for (V child : this.children.keySet())
-    //     {
-    //         if (this.sortRule.execute(target, child))
-    //         {
-    //             TreeNode<V> currentNode = this.children.get(child);
-    //             TreeNode<V> childNode = currentNode.get(target);
-    //             node = childNode != null ? childNode : currentNode;
-    //             break;
-    //         }
-    //     }
-
-    //     return node;
-    // }
-
-    
-    // @Override public void add(V value) 
-    // {
-    //     throw new UnsupportedOperationException("Unimplemented method 'add'");
-    // }    
     @Override public void addChild(V value) { this.children.add(value); }
     @Override public void removeChild(V value) { this.children.remove(value); }
     @Override public Collection<V> getChildren() { return this.children; }
