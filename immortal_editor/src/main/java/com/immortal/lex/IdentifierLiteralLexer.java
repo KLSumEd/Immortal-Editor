@@ -5,12 +5,16 @@ import com.immortal.scan.Scanner;
 
 public class IdentifierLiteralLexer extends Lexer
 {
-    public IdentifierLiteralLexer(Scanner scanner, LexChecker checker) { super(scanner, checker); }
+    private final LexChecker checker;
 
-    @Override public String generateLexeme() 
+    public IdentifierLiteralLexer(Scanner scanner, LexChecker checker) 
+    { 
+        super(scanner); 
+        this.checker = checker;
+    }
+
+    @Override public String lex() 
     {
-        Scanner scanner = this.getScanner();
-        LexChecker checker = this.getLexChecker();
         String lexeme = "";
         int lengthCounter = 0;
         int startingIndex = scanner.getIndex();

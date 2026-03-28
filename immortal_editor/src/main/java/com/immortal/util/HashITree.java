@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class HashITree<V> extends AbstractITree<V>
@@ -17,6 +18,17 @@ public class HashITree<V> extends AbstractITree<V>
         super(sortRule);
         this.treeMap = new HashMap<>();
         this.roots = new ArrayList<>();
+    }
+
+    private HashITree(TreeRule<V> sortRule, Map<V, HashTreeNode<V>> premadeMap, List<V> roots)
+    {
+        super(sortRule);
+
+        this.treeMap = new HashMap<>();
+        this.treeMap.putAll(premadeMap);
+
+        this.roots = new ArrayList<>();
+        this.roots.addAll(roots);
     }
 
     private V traverse(V target)
@@ -91,7 +103,10 @@ public class HashITree<V> extends AbstractITree<V>
         else 
         {
             Set<V> nodeChildren = new HashSet<>();
-            for (V root : this.roots) { if (this.sortRule.execute(root, value)) nodeChildren.add(root); }
+            for (V root : this.roots) 
+            { 
+                if (this.sortRule.execute(root, value)) nodeChildren.add(root); 
+            }
             
             for (V newChild : nodeChildren) 
             { 
@@ -124,8 +139,14 @@ public class HashITree<V> extends AbstractITree<V>
     }
 
     @Override public boolean contains(V target) { return this.treeMap.containsKey(target); }
+    
+    @Override public int size() { return this.treeMap.size(); }
 
-    @Override public Collection<TreeNode<V>> getRoots() 
+    @Override public Collection<V> getRoots() { return this.roots; }
+
+    @Override public Collection<V> getValues() { return this.treeMap.keySet(); }
+
+    @Override public Collection<TreeNode<V>> getRootNodes() 
     {
         List<TreeNode<V>> rootNodes = new ArrayList<>(this.roots.size());
         for (V root : this.roots) { rootNodes.add(this.treeMap.get(root)); }
@@ -133,11 +154,68 @@ public class HashITree<V> extends AbstractITree<V>
         return List.copyOf(rootNodes);
     }
 
+    @Override public ITree<V> subtree(V value) throws NullPointerException
+    {
+        if (!contains(value)) 
+        {
+            throw new NullPointerException(
+                "Cannot create subtree. Given value does not occur within tree."
+            );
+        }
+
+        HashMap<V, HashTreeNode<V>> copyMap = new HashMap<>();
+        copyMap.putAll(this.treeMap);
+
+        HashMap<V, HashTreeNode<V>> subtreeMap = new HashMap<>();
+        boolean traversed = false;
+
+        while (!traversed)
+        {
+            V deepNode = depthFirst(copyMap, value);
+            copyMap.remove(deepNode);
+            subtreeMap.put(deepNode, this.treeMap.get(deepNode));
+            traversed = !copyMap.containsKey(value);
+        }
+
+        HashITree<V> subtree = new HashITree<>(this.sortRule, subtreeMap, List.of(value));
+        return subtree;
+    }
+
+    private static <V> V depthFirst(HashMap<V, HashTreeNode<V>> map, V key)
+    {
+        V currentKey = key;
+        boolean reachedBottom = !map.containsKey(currentKey);
+
+        while (!reachedBottom)
+        {
+            TreeNode<V> currentNode = map.get(currentKey);
+
+            List<V> children = new ArrayList<>();
+            for (V child : currentNode.getChildren())
+            {
+                if (map.containsKey(child)) children.add(child);
+            }
+
+            if (children.isEmpty()) { reachedBottom = true; }
+            else currentKey = children.getFirst();
+        }
+
+        return currentKey;
+    }
+
     @Override public String toString() { return recursiveToString(); }
+
+    public String recursiveToString()
+    {
+        String result = recursiveToString(this.roots, "", 0);
+        return result.substring(0, result.length()-1);
+    }
 
     private String recursiveToString(Collection<V> currentNodes, String prev, int depth)
     {
+        final int maxDepth = 20;
         String result = prev;
+        if (depth > maxDepth) return result; // Stops string from being unnecessarily big
 
         for (V node : currentNodes)
         {
@@ -152,14 +230,6 @@ public class HashITree<V> extends AbstractITree<V>
 
         return result;
     }
-
-    public String recursiveToString()
-    {
-        String result = recursiveToString(this.roots, "", 0);
-        return result.substring(0, result.length()-1);
-    }
-
-    @Override public int size() { return this.treeMap.size(); }
 }
 
 

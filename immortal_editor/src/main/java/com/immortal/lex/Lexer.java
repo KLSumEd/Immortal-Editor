@@ -4,34 +4,16 @@ import com.immortal.scan.Scanner;
 
 public abstract class Lexer 
 {
-    private final Scanner scanner;
-    private static boolean hadLexError = false;
-    
-    public Lexer(Scanner scanner) { this.scanner = scanner; }
-    
-    public abstract String generateLexeme();
+    private boolean hadLexError = false;
+    protected final Scanner scanner;
 
-    protected String lex()
+    public Lexer(Scanner scanner) 
     {
-        boolean isLexing = true;
-        String result = "";
-
-        while (isLexing)
-        {
-            if (this.scanner.isAtEnd())
-            {
-                isLexing = false;
-            }
-            else
-            {
-                char c = this.scanner.peek();
-                result += c;
-            }
-        }
-
-        return result;
+        this.scanner = scanner;
     }
 
-    protected static void error() { hadLexError = true; }
-    public static boolean hasErrorOccurred() { return hadLexError; }
+    public abstract String lex();
+
+    protected void error() { this.hadLexError = true; }
+    public boolean hasErrorOccurred() { return this.hadLexError; }
 }

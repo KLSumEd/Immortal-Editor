@@ -10,7 +10,7 @@ public enum IdentifierLiteralTokenType implements TokenType
     INT(new IntLiteralPatternChecker()),
     FLOAT(new FloatLiteralPatternChecker());
 
-    IdentifierLiteralPatternChecker helper;
+    final IdentifierLiteralPatternChecker helper;
 
     private IdentifierLiteralTokenType(IdentifierLiteralPatternChecker helper) 
     {

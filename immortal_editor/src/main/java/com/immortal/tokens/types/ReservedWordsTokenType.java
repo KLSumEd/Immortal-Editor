@@ -1,9 +1,6 @@
 package com.immortal.tokens.types;
 
-import java.util.HashSet;
-import java.util.Set;
-
-public enum ReservedWordsTokenType implements TokenType
+public enum ReservedWordsTokenType implements KnownLexTokenType
 {
     TRUE("true"),
     FALSE("false"),
@@ -26,20 +23,7 @@ public enum ReservedWordsTokenType implements TokenType
 
     private final String lexeme;
 
-    private static final Set<String> LEXEME_SET;
-
-    static 
-    {
-        Set<String> lexSetBuilder = new HashSet<>();
-        for (ReservedWordsTokenType tokenType : ReservedWordsTokenType.values())
-        {
-            lexSetBuilder.add(tokenType.getLexeme());
-        }
-        LEXEME_SET = Set.copyOf(lexSetBuilder);
-    }
-
     private ReservedWordsTokenType(String lexeme) { this.lexeme = lexeme; }
 
     @Override public String getLexeme() { return this.lexeme; }
-    public static Set<String> getLexSet() { return LEXEME_SET; }
 }

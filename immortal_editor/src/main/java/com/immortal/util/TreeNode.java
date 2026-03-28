@@ -12,7 +12,4 @@ public interface TreeNode<V>
 
     public TreeRule<V> getSortRule();
     public Collection<V> getChildren();
-
-    // public V get(V target);
-    // public void add(V value);
 }
