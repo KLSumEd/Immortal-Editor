@@ -10,19 +10,22 @@ public enum IdentifierLiteralTokenType implements TokenType
     INT(new IntLiteralPatternChecker()),
     FLOAT(new FloatLiteralPatternChecker());
 
-    final IdentifierLiteralPatternChecker helper;
+    final IdentifierLiteralPatternChecker patternChecker;
 
-    private IdentifierLiteralTokenType(IdentifierLiteralPatternChecker helper) 
+    private IdentifierLiteralTokenType(IdentifierLiteralPatternChecker patternChecker) 
     {
-        this.helper = helper;
+        this.patternChecker = patternChecker;
     }
 
-    public CharRangeGroup getCharRangeGroup(String lexeme) 
+    private CharRangeGroup getCharRangeGroup(String lexeme) 
     { 
-        return this.helper.getCharRangeGroup(lexeme); 
+        return this.patternChecker.getCharRangeGroup(lexeme); 
     }
 
-    @Override public String getLexeme() { return null; }
+    public static IdentifierLiteralTokenType getTokenType(String lexeme) 
+    {
+        throw new UnsupportedOperationException("Unimplemented method 'getTokenType'");
+    }
 }
 
 interface IdentifierLiteralPatternChecker

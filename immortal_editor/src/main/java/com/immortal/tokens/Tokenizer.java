@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.immortal.tokens.types.TokenType;
+import com.immortal.tokens.types.KnownLexTokenType;
 
 public class Tokenizer
 {
@@ -12,10 +12,17 @@ public class Tokenizer
 
     public Tokenizer() { this.tokenList = new ArrayList<>(); }
 
-    public void tokenize(String lexeme, TokenType type, int line) 
+    public void tokenize(String lexeme, int line) 
     {
-        Token token = new Token(type, line);
+        KnownLexTokenType type = KnownLexTokenType.getTokenType(lexeme);
+        Token token = new KnownLexToken(type, line);
+
         tokenList.add(token);
+    }
+
+    public boolean checkLexeme(String lexeme)
+    {
+        throw new UnsupportedOperationException();
     }
 
     protected Collection<Token> getTokens() { return this.tokenList; }
