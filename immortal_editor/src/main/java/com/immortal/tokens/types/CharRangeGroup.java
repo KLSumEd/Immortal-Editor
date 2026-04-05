@@ -14,6 +14,22 @@ public class CharRangeGroup
         this.extraChars = extraChars;
     }
 
+    public boolean checkChar(char c)
+    {
+        boolean result = this.extraChars.contains(c);
+
+        if (!result)
+        {
+            for (CharRange cr : this.charRanges)
+            {
+                result = cr.checkChar(c);
+                if (result) break;
+            }
+        }
+
+        return result;
+    }
+
     public List<CharRange> getCharRanges() { return this.charRanges; }
     public Set<Character> getExtraChars() { return this.extraChars; }
 }

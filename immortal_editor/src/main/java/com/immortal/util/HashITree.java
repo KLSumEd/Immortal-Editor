@@ -211,11 +211,11 @@ public class HashITree<V> extends AbstractITree<V>
         return result.substring(0, result.length()-1);
     }
 
+    private static final int MAX_DEPTH = 20;
     private String recursiveToString(Collection<V> currentNodes, String prev, int depth)
     {
-        final int maxDepth = 20;
         String result = prev;
-        if (depth > maxDepth) return result; // Stops string from being unnecessarily big
+        if (depth > MAX_DEPTH) return result; // Stops string from being unnecessarily big
 
         for (V node : currentNodes)
         {

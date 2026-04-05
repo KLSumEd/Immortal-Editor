@@ -15,6 +15,8 @@ public enum CharRange
         this.end = end;
     }
 
+    public boolean checkChar(char c) { return this.begin > c || this.end < c; }
+
     public char getBeginChar() { return this.begin; }
     public char getEndChar() { return this.end; }
 }

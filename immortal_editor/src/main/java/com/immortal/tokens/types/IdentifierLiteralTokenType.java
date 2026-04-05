@@ -5,108 +5,96 @@ import java.util.Set;
 
 public enum IdentifierLiteralTokenType implements TokenType
 {
-    IDENTIFIER(new IdentifierPatternChecker()),
-    STR(new StringLiteralPatternChecker()),
-    INT(new IntLiteralPatternChecker()),
-    FLOAT(new FloatLiteralPatternChecker());
+    IDENTIFIER(IdentifierLexChecker.posChecker, IdentifierLexChecker.corChecker),
+    STR(StringLexChecker.posChecker, StringLexChecker.corChecker),
+    INT(),
+    FLOAT();
 
-    final IdentifierLiteralPatternChecker patternChecker;
+    private final PossibleIdentifierLexChecker posChecker;
+    private final CorrectIdentifierLexChecker corChecker;
 
-    private IdentifierLiteralTokenType(IdentifierLiteralPatternChecker patternChecker) 
+    private IdentifierLiteralTokenType(
+        PossibleIdentifierLexChecker posChecker,
+        CorrectIdentifierLexChecker corChecker
+    ) 
     {
-        this.patternChecker = patternChecker;
-    }
-
-    private CharRangeGroup getCharRangeGroup(String lexeme) 
-    { 
-        return this.patternChecker.getCharRangeGroup(lexeme); 
-    }
-
-    public static IdentifierLiteralTokenType getTokenType(String lexeme) 
-    {
-        throw new UnsupportedOperationException("Unimplemented method 'getTokenType'");
+        this.posChecker = posChecker;
+        this.corChecker = corChecker;
     }
 }
 
-interface IdentifierLiteralPatternChecker
-{
-    public CharRangeGroup getCharRangeGroup(String lexeme);
-}
-
-class IdentifierPatternChecker implements IdentifierLiteralPatternChecker
+abstract class IdentifierLexChecker
 {
     private static final CharRangeGroup ID_HEAD = new CharRangeGroup(
-        List.of(CharRange.UPPER, CharRange.LOWER), Set.of('_')
+        List.of(CharRange.LOWER, CharRange.UPPER), Set.of('_')
     );
+
     private static final CharRangeGroup ID_TAIL = new CharRangeGroup(
-        List.of(CharRange.UPPER, CharRange.LOWER, CharRange.DIGIT), Set.of('_')
+        List.of(CharRange.DIGIT, CharRange.LOWER, CharRange.UPPER), Set.of('_')
     );
 
-    @Override public CharRangeGroup getCharRangeGroup(String lexeme) 
+    public static final PossibleIdentifierLexChecker posChecker = (String lexeme) -> {
+        return checker(lexeme);
+    };
+
+    public static final CorrectIdentifierLexChecker corChecker = (String lexeme) -> {
+        final boolean result = lexeme.isEmpty() ? false : checker(lexeme);
+        return result;
+    };
+
+    private static boolean checker(String lexeme) 
     {
-        CharRangeGroup validGroup = ID_HEAD;
+        boolean valid = true;
 
-        if (lexeme.length() > 1) { validGroup = ID_TAIL; }
+        if (!lexeme.isEmpty()) valid = ID_HEAD.checkChar(lexeme.charAt(0));
 
-        return validGroup;
-    }
-}
-
-class StringLiteralPatternChecker implements IdentifierLiteralPatternChecker
-{
-    private static final CharRangeGroup STRING_HEAD_TAIL = new CharRangeGroup(
-        List.of(), Set.of('"')
-    );
-    private static final CharRangeGroup STRING_BODY = new CharRangeGroup(
-        null, Set.of()
-    );
-
-    @Override public CharRangeGroup getCharRangeGroup(String lexeme) 
-    {
-        CharRangeGroup validGroup = STRING_BODY;
-
-        if (lexeme.length() > 0 && lexeme.charAt(lexeme.length() - 1) == '"')
-        { 
-            validGroup = STRING_HEAD_TAIL; 
-        }
-
-        return validGroup;
-    }
-}
-
-class IntLiteralPatternChecker implements IdentifierLiteralPatternChecker
-{
-    private static final CharRangeGroup NUM = new CharRangeGroup(
-        List.of(CharRange.DIGIT), Set.of()
-    );
-
-    @Override public CharRangeGroup getCharRangeGroup(String lexeme) 
-    {
-        CharRangeGroup validGroup = NUM;
-        return validGroup;
-    }
-}
-
-class FloatLiteralPatternChecker implements IdentifierLiteralPatternChecker
-{
-    private static final CharRangeGroup NUM = new CharRangeGroup(
-        List.of(CharRange.DIGIT), Set.of()
-    );
-
-    private static final CharRangeGroup FLOAT = new CharRangeGroup(
-        List.of(CharRange.DIGIT), Set.of('.')
-    );
-
-    @Override public CharRangeGroup getCharRangeGroup(String lexeme) 
-    {
-        CharRangeGroup validGroup = FLOAT;
-        for (char c : lexeme.toCharArray())
+        if (valid)
         {
-            if (c == '.')
+            for (int i = 1; i < lexeme.length(); i++)
             {
-                validGroup = NUM;
+                valid = ID_TAIL.checkChar(lexeme.charAt(i));
+                if (!valid) break;
             }
         }
-        return validGroup;
+
+        return valid;
     }
+}
+
+abstract class StringLexChecker
+{
+    public static final PossibleIdentifierLexChecker posChecker = (String lexeme) -> {
+        return checker(lexeme);
+    };
+
+    public static final CorrectIdentifierLexChecker corChecker = (String lexeme) -> {
+        return checker(lexeme) && lexeme.charAt(lexeme.length()-1) == '"';
+    };
+
+    private static boolean checker(String lexeme)
+    {
+        boolean valid = true;
+
+        if (!lexeme.isEmpty()) valid = lexeme.charAt(0) == '"';
+
+        boolean terminated = false;
+        for (int i = 1; i < lexeme.length(); i++) 
+        {
+            char c = lexeme.charAt(i);
+            if (terminated) { valid = false; break; }
+            else { terminated = c == '"' && lexeme.charAt(i-1) != '\\'; }
+        }
+
+        return valid;
+    }
+}
+
+interface PossibleIdentifierLexChecker
+{
+    public boolean execute(String lexeme);
+}
+
+interface CorrectIdentifierLexChecker
+{
+    public boolean execute(String lexeme);
 }
