@@ -6,10 +6,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Collection;
 
-import com.immortal.scan._Scanner;
+import com.immortal.lex.Lexer;
+import com.immortal.scan.Scanner;
 import com.immortal.tokens.Token;
+import com.immortal.tokens.Tokenizer;
 
 public class Parser 
 {
@@ -51,8 +53,10 @@ public class Parser
 
     private static void run(String source) 
     {
-        _Scanner scanner = new _Scanner(source);
-        List<Token> tokens = scanner.scanTokens();
+        Scanner scanner = new Scanner(source);
+        Tokenizer tokenizer = new Tokenizer();
+        Lexer lexer = new Lexer(scanner, tokenizer);
+        Collection<Token> tokens = lexer.lexAll();
         if (hadError) return;
         // For now, just print the tokens.
         for (Token token : tokens) {System.out.println(token);}
