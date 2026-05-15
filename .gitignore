@@ -1,1 +1,5 @@
 /.vscode/
+/.VSCodeCounter/
+/immortal_editor/src/main/java/com/immortal/util/UtilTest.java
+/immortal_editor/src/main/java/com/immortal/lex/StaticTest.java
+/immortal_editor/target

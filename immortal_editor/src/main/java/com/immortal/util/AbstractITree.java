@@ -2,9 +2,11 @@ package com.immortal.util;
 
 public abstract class AbstractITree<V> implements ITree<V>
 {
-    protected final TreeRule<V> sortRule;
+    private final TreeRule<V> sortRule;
 
-    public AbstractITree(TreeRule<V> sortRule) { this.sortRule = sortRule; }
+    public AbstractITree(TreeRule<V> sortRule)
+    { this.sortRule = sortRule; }
 
-    @Override public TreeRule<V> getSortRule() { return this.sortRule; }
+    @Override public TreeRule<V> getSortRule()
+    { return this.sortRule; }
 }
