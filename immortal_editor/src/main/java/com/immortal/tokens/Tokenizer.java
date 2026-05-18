@@ -1,8 +1,8 @@
 package com.immortal.tokens;
 
+@FunctionalInterface
 public interface Tokenizer
 {
-    public Token tokenize(String lexeme, int line);
-
-    public boolean checkLex(String lexeme);
+    public Token tokenize(String lexeme, int line)
+            throws IllegalArgumentException;
 }

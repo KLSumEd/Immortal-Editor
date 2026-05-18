@@ -13,15 +13,17 @@ public abstract class AbstractLexer implements Lexer
     private final String comInitiatorSL;
     private final EnclosedPattern comPatternML;
     private boolean hadLexError;
-
-    public AbstractLexer(String source, String comInitiatorSL, EnclosedPattern comPatternML)
+    
+    public AbstractLexer(
+            String source, String comInitiatorSL, EnclosedPattern comPatternML
+    )
     {
         this.scanner = new Scanner(source);
         this.comInitiatorSL = comInitiatorSL;
         this.comPatternML = EnclosedPattern.copyOf(comPatternML);
         this.hadLexError = false;
     }
-
+    
     public AbstractLexer(String source, String comInitiatorSL)
     {
         this.scanner = new Scanner(source);
@@ -29,7 +31,7 @@ public abstract class AbstractLexer implements Lexer
         this.comPatternML = new EnclosedPattern("/*", "*/");
         this.hadLexError = false;
     }
-
+    
     public AbstractLexer(String source)
     {
         this.scanner = new Scanner(source);
@@ -37,29 +39,31 @@ public abstract class AbstractLexer implements Lexer
         this.comPatternML = new EnclosedPattern("/*", "*/");
         this.hadLexError = false;
     }
-
+    
     @Override public Collection<Token> lex()
     {
         List<Token> tokens = new ArrayList<>();
+        
         while (!this.scanner.isAtEnd() && !this.hadLexError)
         { if (!skip()) tokens.add(lexToken()); }
-
+        
         return tokens;
     }
-
+    
     protected abstract Token lexToken();
-
-    private final boolean skip()
+    
+    private boolean skip()
     { return skipWhiteSpace() || skipCommentSL() || skipCommentML(); }
-
-    private final boolean skipWhiteSpace()
+    
+    private boolean skipWhiteSpace()
     {
         boolean result = false;
         boolean isWhiteSpace = false;
-
+        
         do
         {
             char c = this.scanner.peek();
+            
             switch (c)
             {
                 case '\n':
@@ -72,23 +76,23 @@ public abstract class AbstractLexer implements Lexer
                     this.scanner.incrementIndex();
                     isWhiteSpace = true;
                     break;
-
+                
                 default:
                     result = isWhiteSpace;
                     isWhiteSpace = false;
                     break;
             }
-
+            
         }
         while (isWhiteSpace);
-
+        
         return result;
     }
-
+    
     protected final boolean skipCommentSL()
     {
         boolean result = false;
-
+        
         if (this.scanner.peek(2).equals(this.comInitiatorSL))
         {
             int commentLen = this.scanner.peekUntil('\n', true).length();
@@ -96,31 +100,32 @@ public abstract class AbstractLexer implements Lexer
             this.scanner.incrementLine();
             result = true;
         }
-
+        
         return result;
     }
-
+    
     protected final boolean skipCommentML()
     {
         boolean result = false;
         final int lenInitiator = this.comPatternML.getInitiator().length();
         final String beginning = this.scanner.peek(lenInitiator);
-
+        
         if (this.comPatternML.matchBeginning(beginning))
         {
             this.scanner.advance(lenInitiator);
-            String s = this.scanner.peekUntil(this.comPatternML.getTerminator(), true);
+            String s = this.scanner.peekUntil(this.comPatternML.getTerminator(),
+                    true);
             int dist = s.length();
             this.scanner.advance(dist);
             result = true;
         }
-
+        
         return result;
     }
-
+    
     protected final void error()
     { this.hadLexError = true; }
-
+    
     public final boolean hasErrorOccurred()
     { return this.hadLexError; }
 }

@@ -1,11 +1,11 @@
 package com.immortal.tokens;
 
-public class KnownLexTokenizer implements Tokenizer
+public class SymbolTokenizer implements Tokenizer
 {
     @Override public Token tokenize(String lexeme, int line)
+            throws IllegalArgumentException
     {
         final KnownLexTokenType type = KnownLexTokenType.getTokenType(lexeme);
-        final KnownLexToken token = new KnownLexToken(type, line);
-        return token;
+        return new KnownLexToken(type, line);
     }
 }
