@@ -31,9 +31,7 @@ public class StringTransitioner implements LexState.StateTransitioner
                 result = lexeme.length() >= 2
                         && lexeme.charAt(lexeme.length() - 1) == '"'
                         && lexeme.charAt(lexeme.length() - 2) != '\\';
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException(
-                        "Unimplemented method 'checkTerminated'");
+                return result;
             }
         },
         MULTI
