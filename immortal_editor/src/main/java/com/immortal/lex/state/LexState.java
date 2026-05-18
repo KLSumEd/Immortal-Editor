@@ -67,7 +67,7 @@ public enum LexState implements Tokenizer
     @Override public Token tokenize(String lexeme, int line)
     { return this.tokenizer.tokenize(lexeme, line); }
     
-    public LexState getNextState(String lexeme)
+    public LexState getNextState(String lexeme) throws IllegalArgumentException
     {
         LexState result = ERROR;
         

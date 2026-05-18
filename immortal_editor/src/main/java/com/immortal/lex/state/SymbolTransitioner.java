@@ -15,7 +15,7 @@ public class SymbolTransitioner implements LexState.StateTransitioner
         char last = lexeme.charAt(lexeme.length() - 1);
         
         if (VALID_SYMS.checkChar(last)
-                && !KnownLexTokenType.getPossibleLexemes(lexeme).isEmpty())
+                && !KnownLexTokenType.isPossibleLexeme(lexeme))
         { result = SYMBOL; }
         
         return result;

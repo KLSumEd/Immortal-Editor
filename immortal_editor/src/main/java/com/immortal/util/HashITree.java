@@ -43,27 +43,16 @@ public class HashITree<V> extends AbstractITree<V>
         while (!found)
         {
             
-            if (target.equals(currentNodeValue))
-            {
-                found = true;
-            }
+            if (target.equals(currentNodeValue)) found = true;
             else
             {
                 HashTreeNode<V> currentNode = this.treeMap
                         .get(currentNodeValue);
                 V child = checkChildren(currentNode, target);
                 
-                if (child != null)
-                {
-                    currentNodeValue = child;
-                }
-                else
-                {
-                    found = true;
-                }
-                
+                if (child != null) currentNodeValue = child;
+                else found = true;
             }
-            
         }
         
         return currentNodeValue;

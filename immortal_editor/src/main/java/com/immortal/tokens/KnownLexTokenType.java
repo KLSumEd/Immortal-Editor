@@ -64,6 +64,7 @@ public enum KnownLexTokenType implements TokenType
     
     private static final Map<String, KnownLexTokenType> LEX_TOKEN_MAP;
     private static final ITree<String> TOKEN_TREE;
+    private static final int MAX_LEN;
     
     static
     {
@@ -71,20 +72,28 @@ public enum KnownLexTokenType implements TokenType
                 target) -> (source.startsWith(target));
         TOKEN_TREE = new HashITree<>(RULE);
         LEX_TOKEN_MAP = new HashMap<>();
+        int lenChecker = 0;
         
         for (KnownLexTokenType tokenType : KnownLexTokenType.values())
         {
             TOKEN_TREE.put(tokenType.getLexeme());
             LEX_TOKEN_MAP.put(tokenType.getLexeme(), tokenType);
+            lenChecker = Math.max(lenChecker, tokenType.getLexeme().length());
         }
         
+        MAX_LEN = lenChecker;
     }
     
-    public static Collection<String> getPossibleLexemes(String lexeme)
+    @Deprecated public static Collection<String> getPossibleLexemes(
+            String lexeme
+    )
     {
         ITree<String> subtree = TOKEN_TREE.subtree(lexeme);
         return subtree.getValues();
     }
+    
+    public static boolean isPossibleLexeme(String lexeme)
+    { return lexeme.length() <= MAX_LEN; }
     
     public static KnownLexTokenType getTokenType(String lexeme)
     { return LEX_TOKEN_MAP.get(lexeme); }

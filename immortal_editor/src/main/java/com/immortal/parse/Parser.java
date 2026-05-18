@@ -6,6 +6,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
+
+import com.immortal.lex.ImmortalLexer;
+import com.immortal.lex.Lexer;
+import com.immortal.tokens.Token;
 
 public class Parser
 {
@@ -52,30 +57,29 @@ public class Parser
             if (line.equals("\u0004"))
             { break; }
             
-            run(line);
+            run(line + '\0');
             hadError = false;
         }
         
     }
     
-    private static void run(@SuppressWarnings("unused") String source)
+    private static void run(String source)
     {
-        // Scanner scanner = new Scanner(source);
-        // Let's think, is the scanner ever used here?
-        // No?
-        // So why am I making it
-        // No good reason
-        // The parser acts like it is connecting disparate objects
-        // But the lexing process does not exist without the scanner
-        // It is a *weak* object
+        final Lexer lexer = new ImmortalLexer(source);
+        final Collection<Token> tokens = lexer.lex();
         
-        // Tokenizer tokenizer = new Tokenizer();
-        // Lexer lexer = new Lexer(scanner, tokenizer);
-        // Collection<Token> tokens = lexer.lexAll();
-        // if (hadError) return;
-        // For now, just print the tokens.
-        // for (Token token : tokens) {System.out.println(token);}
-        throw new UnsupportedOperationException("Unimplemented method 'run'");
+        if (lexer.hasErrorOccurred())
+        {
+            error(lexer.getLastLine(), lexer.getErrorMessage());
+        }
+        else
+        {
+            // For now, just print the tokens.
+            
+            for (Token token : tokens)
+            { System.out.println(token); }
+        }
+        
     }
     
     public static void error(int line, String message)

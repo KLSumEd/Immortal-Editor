@@ -9,6 +9,8 @@ import com.immortal.tokens.Token;
 
 public final class ImmortalLexer extends AbstractLexer
 {
+    private String errMsg = "";
+    
     public ImmortalLexer(String source)
     { super(source); }
     
@@ -20,12 +22,21 @@ public final class ImmortalLexer extends AbstractLexer
         int index = startIndex;
         String lexBuilder = "";
         
-        while (state != TERMINATED && state != ERROR
-                && !this.scanner.isAtEnd(index))
+        while (state != TERMINATED && state != ERROR)
         {
             prevState = state;
             lexBuilder += this.scanner.peekIndex(index);
-            state = state.getNextState(lexBuilder);
+            
+            try
+            {
+                state = state.getNextState(lexBuilder);
+            }
+            catch (IllegalArgumentException e)
+            {
+                state = ERROR;
+                this.errMsg = e.getMessage();
+            }
+            
             index++;
         }
         
@@ -33,7 +44,7 @@ public final class ImmortalLexer extends AbstractLexer
         
         if (state == TERMINATED)
         {
-            final int dist = index - startIndex;
+            final int dist = index - startIndex - 1;
             final String lexeme = this.scanner.advance(dist);
             token = prevState.tokenize(lexeme, this.scanner.getLine());
         }
@@ -45,4 +56,7 @@ public final class ImmortalLexer extends AbstractLexer
         
         return token;
     }
+    
+    @Override public final String getErrorMessage()
+    { return this.errMsg; }
 }

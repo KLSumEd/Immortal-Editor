@@ -46,7 +46,7 @@ public abstract class AbstractLexer implements Lexer
     
     @Override public Collection<Token> lex()
     {
-        List<Token> tokens = new ArrayList<>();
+        final List<Token> tokens = new ArrayList<>();
         
         while (!this.scanner.isAtEnd() && !this.hadLexError)
         { if (!skip()) tokens.add(lexToken()); }
@@ -130,6 +130,9 @@ public abstract class AbstractLexer implements Lexer
     protected final void error()
     { this.hadLexError = true; }
     
-    public final boolean hasErrorOccurred()
+    @Override public final boolean hasErrorOccurred()
     { return this.hadLexError; }
+    
+    @Override public final int getLastLine()
+    { return this.scanner.getLine(); }
 }
