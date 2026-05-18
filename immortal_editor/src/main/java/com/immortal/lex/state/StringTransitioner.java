@@ -9,14 +9,21 @@ public class StringTransitioner implements LexState.StateTransitioner
     @Override public LexState getNextState(String lexeme)
             throws IndexOutOfBoundsException
     {
-        LexState result;
-        StringType type = StringType.getStringType(lexeme);
         final char last = lexeme.charAt(lexeme.length() - 1);
         
-        if ((last == '\0') || (type == StringType.SINGLE && last == '\n'))
-            result = ERROR;
-        else if (type.checkTerminated(lexeme)) result = TERMINATED;
-        else result = STRING;
+        final LexState result = switch (lexeme.length())
+        {
+            case 1, 3 -> last == '"' ? STRING : TERMINATED;
+            case 2 -> lexeme.charAt(0) == '"' ? STRING : ERROR;
+            default ->
+            {
+                final StringType type = StringType.getStringType(lexeme);
+                if (type == StringType.NONE) yield ERROR;
+                else if (type.checkTerminated(lexeme)) yield TERMINATED;
+                else if (type == StringType.SINGLE && last == '\n') yield ERROR;
+                else yield STRING;
+            }
+        };
         
         return result;
     }
@@ -27,10 +34,10 @@ public class StringTransitioner implements LexState.StateTransitioner
         {
             @Override public boolean checkTerminated(String lexeme)
             {
-                boolean result;
-                result = lexeme.length() >= 2
-                        && lexeme.charAt(lexeme.length() - 1) == '"'
-                        && lexeme.charAt(lexeme.length() - 2) != '\\';
+                final boolean result;
+                result = lexeme.length() >= 3
+                        && lexeme.charAt(lexeme.length() - 2) == '"'
+                        && lexeme.charAt(lexeme.length() - 3) != '\\';
                 return result;
             }
         },
@@ -38,8 +45,10 @@ public class StringTransitioner implements LexState.StateTransitioner
         {
             @Override public boolean checkTerminated(String lexeme)
             {
-                boolean result;
-                result = lexeme.length() >= 6 && lexeme.endsWith("\"\"\"")
+                final String truncated = lexeme.substring(0,
+                        lexeme.length() - 1);
+                final boolean result;
+                result = truncated.length() >= 7 && lexeme.endsWith("\"\"\"")
                         && lexeme.charAt(lexeme.length() - 4) != '\\';
                 return result;
             }
@@ -54,7 +63,7 @@ public class StringTransitioner implements LexState.StateTransitioner
         {
             final StringType type;
             
-            type = (lexeme.startsWith("\"\"\"")) ? MULTI
+            type = (lexeme.startsWith("\"\"\"\n")) ? MULTI
                     : (lexeme.startsWith("\"")) ? SINGLE : NONE;
             
             return type;

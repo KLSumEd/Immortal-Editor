@@ -3,16 +3,17 @@ package com.immortal.tokens;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.immortal.tokens.IdentifierLiteralTokenType.STR;
+
 public class StringTokenizer implements Tokenizer
 {
     private static final Pattern UNICODE_PATTERN = Pattern
             .compile("\\\\u\\+?[a-f0-9]{4}", Pattern.CASE_INSENSITIVE);
-    private static final TokenType TYPE = IdentifierLiteralTokenType.STR;
     
     @Override public Token tokenize(String lexeme, int line)
             throws IllegalArgumentException
     {
-        String literal = stripQuotationMarks(lexeme);
+        String literal = StringType.getStringType(lexeme).format(lexeme);
         literal = literal.translateEscapes();
         
         final Matcher matcher = UNICODE_PATTERN.matcher(literal);
@@ -25,15 +26,36 @@ public class StringTokenizer implements Tokenizer
             return Character.toString(codePoint);
         });
         
-        final Token token = new LiteralToken(TYPE, lexeme, literal, line);
+        final Token token = new LiteralToken(STR, lexeme, literal, line);
         return token;
     }
     
-    private String stripQuotationMarks(String lexeme)
+    private static enum StringType
     {
-        String result = lexeme.startsWith("\"\"\"")
-                ? lexeme.substring(3, lexeme.length() - 3)
-                : lexeme.substring(1, lexeme.length() - 1);
-        return result;
+        SINGLELINE
+        {
+            @Override public String format(String lexeme)
+            { return lexeme.substring(1, lexeme.length() - 1); }
+        },
+        MULTILINE
+        {
+            @Override public String format(String lexeme)
+            {
+                String result;
+                result = lexeme.substring(3, lexeme.length() - 3);
+                final int dist = lexeme.length() - lexeme.lastIndexOf('\n') - 1;
+                final String endLinePatternRegex = "\\n\\s{%d}".formatted(dist);
+                final Pattern endLinePattern = Pattern
+                        .compile(endLinePatternRegex);
+                result = endLinePattern.matcher(result).replaceAll("\n");
+                result = result.substring(1);
+                return result;
+            }
+        };
+        
+        public abstract String format(String lexeme);
+        
+        public static StringType getStringType(String lexeme)
+        { return lexeme.startsWith("\"\"\"\n") ? MULTILINE : SINGLELINE; }
     }
 }

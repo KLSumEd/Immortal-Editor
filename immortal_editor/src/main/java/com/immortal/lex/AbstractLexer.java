@@ -6,13 +6,18 @@ import java.util.List;
 
 import com.immortal.scan.Scanner;
 import com.immortal.tokens.Token;
+import com.immortal.util.EnclosedPattern;
 
 public abstract class AbstractLexer implements Lexer
 {
+    /// ATTRIBUTES ///
+    
     protected final Scanner scanner;
     private final String comInitiatorSL;
     private final EnclosedPattern comPatternML;
-    private boolean hadLexError;
+    private boolean hadLexError = false;
+    
+    /// CONSTRUCTORS ///
     
     public AbstractLexer(
             String source, String comInitiatorSL, EnclosedPattern comPatternML
@@ -21,7 +26,6 @@ public abstract class AbstractLexer implements Lexer
         this.scanner = new Scanner(source);
         this.comInitiatorSL = comInitiatorSL;
         this.comPatternML = EnclosedPattern.copyOf(comPatternML);
-        this.hadLexError = false;
     }
     
     public AbstractLexer(String source, String comInitiatorSL)
@@ -29,7 +33,6 @@ public abstract class AbstractLexer implements Lexer
         this.scanner = new Scanner(source);
         this.comInitiatorSL = comInitiatorSL;
         this.comPatternML = new EnclosedPattern("/*", "*/");
-        this.hadLexError = false;
     }
     
     public AbstractLexer(String source)
@@ -37,8 +40,9 @@ public abstract class AbstractLexer implements Lexer
         this.scanner = new Scanner(source);
         this.comInitiatorSL = "//";
         this.comPatternML = new EnclosedPattern("/*", "*/");
-        this.hadLexError = false;
     }
+    
+    /// METHODS ///
     
     @Override public Collection<Token> lex()
     {

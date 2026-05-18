@@ -1,4 +1,4 @@
-package com.immortal.lex;
+package com.immortal.util;
 
 public final class EnclosedPattern
 {
