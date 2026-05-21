@@ -10,12 +10,13 @@ public class IDTransitioner implements LexState.StateTransitioner
     @Override public LexState getNextState(String lexeme)
             throws IndexOutOfBoundsException
     {
-        LexState result = TERMINATED;
+        final LexState result;
+        final char last = lexeme.charAt(lexeme.length() - 1);
         
-        char last = lexeme.charAt(lexeme.length() - 1);
         if ((lexeme.length() > 1 && ID_PART.checkChar(last))
                 || (ID_HEAD.checkChar(last)))
             result = ID;
+        else result = TERMINATED;
         
         return result;
     }

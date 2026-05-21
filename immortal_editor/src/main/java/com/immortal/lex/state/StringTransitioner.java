@@ -58,8 +58,6 @@ public class StringTransitioner implements LexState.StateTransitioner
             
             try
             {
-                final String beginning = lexeme.substring(0, 3);
-                
                 if (lexeme.startsWith("\"\"\"\n")) result = MULTI;
                 else if (lexeme.startsWith("\"")) result = SINGLE;
                 else throw new IllegalArgumentException(

@@ -46,7 +46,22 @@ public final class ImmortalLexer extends AbstractLexer
         {
             final int dist = index - startIndex - 1;
             final String lexeme = this.scanner.advance(dist);
-            token = prevState.tokenize(lexeme, this.scanner.getLine());
+            Token resultToken = new NullToken(this.scanner.getLine());
+            
+            try
+            {
+                resultToken = prevState.tokenize(lexeme,
+                        this.scanner.getLine());
+            }
+            catch (final IllegalArgumentException e)
+            {
+                error();
+                this.errMsg = e.getMessage();
+            }
+            finally
+            {
+                token = resultToken;
+            }
         }
         else
         {

@@ -12,13 +12,15 @@ public class WordTransitioner implements LexState.StateTransitioner
     @Override public LexState getNextState(String lexeme)
             throws IndexOutOfBoundsException
     {
-        LexState result = TERMINATED;
+        final LexState result;
         
         final char last = lexeme.charAt(lexeme.length() - 1);
-        if (ALPHA.checkChar(last)) result = WORD;
-        else if (DIGIT.checkChar(last)
+        
+        if (DIGIT.checkChar(last)
                 || lexeme.length() > KnownLexTokenType.getMaxTokenLen())
             result = ID;
+        else if (ALPHA.checkChar(last)) result = WORD;
+        else result = TERMINATED;
         
         return result;
     }
