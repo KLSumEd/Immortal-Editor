@@ -1,17 +1,8 @@
 package com.immortal.tokens;
 
-import java.util.List;
-
-public class Tokenizer
+@FunctionalInterface
+public interface Tokenizer
 {
-    private final List<Token> tokenList;
-
-    public Tokenizer(List<Token> newTokenList) 
-    {
-        this.tokenList = newTokenList;
-    }
-
-    public void tokenize() {}
-
-    protected List<Token> getTokenList() { return this.tokenList; }
+    public Token tokenize(String lexeme, int line)
+            throws IllegalArgumentException;
 }

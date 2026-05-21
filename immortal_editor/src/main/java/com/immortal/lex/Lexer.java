@@ -1,53 +1,13 @@
 package com.immortal.lex;
 
-import com.immortal.lex.checker.SingleCharLexChecker;
-import com.immortal.lex.checker.SingleDoubleCharLexChecker;
-import com.immortal.scan.Scanner;
+import java.util.Collection;
 
-public abstract class Lexer 
+import com.immortal.tokens.Token;
+
+public interface Lexer
 {
-    private final Scanner scanner;
-    private static boolean hadLexError = false;
-    
-    public Lexer(Scanner scanner) { this.scanner = scanner; }
-    
-    public abstract String generateLexeme();
-
-    protected String lex()
-    {
-        String result = "";
-
-
-        while (!this.scanner.isAtEnd())
-        {
-            char c = this.scanner.peek();
-            result += c;
-            SingleCharLexChecker singleCharLexChecker = new SingleCharLexChecker();
-            SingleDoubleCharLexChecker singleDoubleCharLexChecker = new SingleDoubleCharLexChecker();
-            if (singleCharLexChecker.checkLex(result))
-            {
-                
-            }
-            else if (singleDoubleCharLexChecker.checkLex(result))
-            {
-                finiteLookahead(c);
-            }
-
-        }
-
-        return result;
-    }
-
-    private void finiteLookahead(int dist) 
-    {
-        for (int i = 0; i < dist; i++)
-        {
-
-        }
-    }
-
-    protected Scanner getScanner() { return this.scanner; }
-
-    protected static void error() { hadLexError = true; }
-    public static boolean hasErrorOccurred() { return hadLexError; }
+    public Collection<Token> lex();
+    public boolean hasErrorOccurred();
+    public String getErrorMessage();
+    public int getLastLine();
 }
