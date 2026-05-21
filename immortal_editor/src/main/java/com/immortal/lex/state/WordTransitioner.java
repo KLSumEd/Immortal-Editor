@@ -17,7 +17,7 @@ public class WordTransitioner implements LexState.StateTransitioner
         final char last = lexeme.charAt(lexeme.length() - 1);
         if (ALPHA.checkChar(last)) result = WORD;
         else if (DIGIT.checkChar(last)
-                || KnownLexTokenType.isPossibleLexeme(lexeme))
+                || lexeme.length() > KnownLexTokenType.getMaxTokenLen())
             result = ID;
         
         return result;

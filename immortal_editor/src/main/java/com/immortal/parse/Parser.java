@@ -24,15 +24,8 @@ public class Parser
             System.out.println("Usage: ImmortalScript [script]");
             System.exit(64);
         }
-        else if (args.length == 1)
-        {
-            runFile(args[0]);
-        }
-        else
-        {
-            runPrompt();
-        }
-        
+        else if (args.length == 1) runFile(args[0]);
+        else runPrompt();
     }
     
     private static void runFile(String path) throws IOException
@@ -57,10 +50,9 @@ public class Parser
             if (line.equals("\u0004"))
             { break; }
             
-            run(line + '\0');
+            run(line);
             hadError = false;
         }
-        
     }
     
     private static void run(String source)

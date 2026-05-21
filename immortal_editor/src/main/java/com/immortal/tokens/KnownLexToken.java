@@ -11,7 +11,7 @@ public class KnownLexToken extends Token
     }
     
     @Override public String getLexeme()
-    { return this.type.getLexeme(); }
+    { return this.type.getLexemes()[0]; }
     
     @Override public TokenType getType()
     { return this.type; }

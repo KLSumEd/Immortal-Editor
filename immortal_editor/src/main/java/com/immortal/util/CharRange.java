@@ -21,7 +21,7 @@ public class CharRange implements CharGroup
     }
     
     @Override public final boolean checkChar(char c)
-    { return this.start < c && c < this.end; }
+    { return this.start <= c && c <= this.end; }
     
     public final char getBeginChar()
     { return this.start; }

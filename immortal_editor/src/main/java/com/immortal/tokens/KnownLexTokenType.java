@@ -1,12 +1,8 @@
 package com.immortal.tokens;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.immortal.util.HashITree;
-import com.immortal.util.ITree;
-import com.immortal.util.TreeRule;
 
 public enum KnownLexTokenType implements TokenType
 {
@@ -28,7 +24,6 @@ public enum KnownLexTokenType implements TokenType
     EOF("\0"),
     
     // One-or-Two-Character Tokens
-    EXCL("!"),
     EXCL_EQUAL("!="),
     EQUAL("="),
     EQUAL_EQUAL("=="),
@@ -38,15 +33,15 @@ public enum KnownLexTokenType implements TokenType
     LESS_EQUAL("<="),
     
     // Keyword Tokens
-    STR("str"),           // <--- For the following entries
-    INT("int"),           // <--- ensure the given TokenType
-    BOOL("bool"),         // <--- refers to the
-    FLOAT("float"),       // <--- TYPE KEYWORD TOKENS,
-    CHAR("char"),         // <--- NOT the LITERAL TOKENS
-    FUNC("function"),
-    AND("and"),
-    OR("or"),
-    NOT("not"),
+    STR("str", "string"),         // <--- For the following entries
+    INT("int", "integer"),        // <--- ensure the given TokenType
+    BOOL("bool", "boolean"),      // <--- refers to the
+    FLOAT("float", "real"),       // <--- TYPE KEYWORD TOKENS,
+    CHAR("char", "character"),    // <--- NOT the LITERAL TOKENS
+    FUNC("function", "func"),
+    AND("and", "&&"),
+    OR("or", "||"),
+    NOT("not", "!"),
     IF("if"),
     ELSE("else"),
     RETURN("return"),
@@ -63,50 +58,54 @@ public enum KnownLexTokenType implements TokenType
     ///// STATIC /////
     
     private static final Map<String, KnownLexTokenType> LEX_TOKEN_MAP;
-    private static final ITree<String> TOKEN_TREE;
     private static final int MAX_LEN;
     
     static
     {
-        final TreeRule<String> RULE = (source,
-                target) -> (source.startsWith(target));
-        TOKEN_TREE = new HashITree<>(RULE);
-        LEX_TOKEN_MAP = new HashMap<>();
+        final Map<String, KnownLexTokenType> lexTokenMapBuilder = new HashMap<>();
         int lenChecker = 0;
         
-        for (KnownLexTokenType tokenType : KnownLexTokenType.values())
+        for (final KnownLexTokenType tokenType : KnownLexTokenType.values())
         {
-            TOKEN_TREE.put(tokenType.getLexeme());
-            LEX_TOKEN_MAP.put(tokenType.getLexeme(), tokenType);
-            lenChecker = Math.max(lenChecker, tokenType.getLexeme().length());
+            
+            for (final String lexeme : tokenType.getLexemes())
+            {
+                lexTokenMapBuilder.put(lexeme, tokenType);
+                lenChecker = Math.max(lenChecker, lexeme.length());
+            }
         }
         
+        LEX_TOKEN_MAP = Map.copyOf(lexTokenMapBuilder);
         MAX_LEN = lenChecker;
     }
-    
-    @Deprecated public static Collection<String> getPossibleLexemes(
-            String lexeme
-    )
-    {
-        ITree<String> subtree = TOKEN_TREE.subtree(lexeme);
-        return subtree.getValues();
-    }
-    
-    public static boolean isPossibleLexeme(String lexeme)
-    { return lexeme.length() <= MAX_LEN; }
     
     public static KnownLexTokenType getTokenType(String lexeme)
     { return LEX_TOKEN_MAP.get(lexeme); }
     
+    public static int getMaxTokenLen()
+    { return MAX_LEN; }
+    
     ///// NON-STATIC /////
     
-    private final String lexeme;
+    private final String[] lexemes;
     
-    private KnownLexTokenType(String lexeme)
-    { this.lexeme = lexeme; }
+    private KnownLexTokenType(String... lexemes) throws IllegalArgumentException
+    {
+        if (lexemes.length == 0) throw new IllegalArgumentException(
+                "Token must have at least one lexeme");
+        
+        for (final String lexeme : lexemes)
+        {
+            if (lexeme.isBlank()) throw new IllegalArgumentException(
+                    "Known Lexeme cannot be blank");
+            else if (lexeme.contains(" ")) throw new IllegalArgumentException(
+                    "Known Lexeme cannot contain whitespace");
+        }
+        this.lexemes = Arrays.copyOf(lexemes, lexemes.length);
+    }
     
-    public String getLexeme()
-    { return this.lexeme; }
+    public String[] getLexemes()
+    { return Arrays.copyOf(this.lexemes, this.lexemes.length); }
     
     @Override public String toString()
     {

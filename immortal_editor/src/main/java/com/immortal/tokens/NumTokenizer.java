@@ -1,8 +1,5 @@
 package com.immortal.tokens;
 
-import static com.immortal.tokens.IdentifierLiteralTokenType.FLOAT;
-import static com.immortal.tokens.IdentifierLiteralTokenType.INT;
-
 public class NumTokenizer implements Tokenizer
 {
     @Override public Token tokenize(String lexeme, int line)
@@ -12,10 +9,19 @@ public class NumTokenizer implements Tokenizer
         
         try
         {
-            final Object literal = isFloat ? Float.valueOf(lexeme)
-                    : Integer.valueOf(lexeme);
-            final TokenType type = isFloat ? FLOAT : INT;
-            final Token token = new LiteralToken(type, lexeme, literal, line);
+            final Token token;
+            
+            if (isFloat)
+            {
+                final float literal = Float.parseFloat(lexeme);
+                token = new FloatToken(lexeme, literal, line);
+            }
+            else
+            {
+                final int literal = Integer.parseInt(lexeme);
+                token = new IntToken(lexeme, literal, line);
+            }
+            
             return token;
         }
         catch (final NumberFormatException e)

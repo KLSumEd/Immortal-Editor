@@ -7,23 +7,20 @@ import static com.immortal.lex.state.LexState.TERMINATED;
 public class StringTransitioner implements LexState.StateTransitioner
 {
     @Override public LexState getNextState(String lexeme)
-            throws IndexOutOfBoundsException
+            throws IndexOutOfBoundsException, IllegalArgumentException
     {
         final char last = lexeme.charAt(lexeme.length() - 1);
         
-        final LexState result = switch (lexeme.length())
+        final LexState result;
+        
+        if (lexeme.length() < 3 || lexeme.equals("\"\"\"")) result = STRING;
+        else
         {
-            case 1, 3 -> last == '"' ? STRING : TERMINATED;
-            case 2 -> lexeme.charAt(0) == '"' ? STRING : ERROR;
-            default ->
-            {
-                final StringType type = StringType.getStringType(lexeme);
-                if (type == StringType.NONE) yield ERROR;
-                else if (type.checkTerminated(lexeme)) yield TERMINATED;
-                else if (type == StringType.SINGLE && last == '\n') yield ERROR;
-                else yield STRING;
-            }
-        };
+            final StringType type = StringType.getStringType(lexeme);
+            if (type.checkTerminated(lexeme)) result = TERMINATED;
+            else if (type == StringType.SINGLE && last == '\n') result = ERROR;
+            else result = STRING;
+        }
         
         return result;
     }
@@ -32,43 +29,71 @@ public class StringTransitioner implements LexState.StateTransitioner
     {
         SINGLE
         {
-            @Override public boolean checkTerminated(String lexeme)
+            @Override public boolean _checkTerminated(String lexeme)
             {
-                final boolean result;
-                result = lexeme.length() >= 3
-                        && lexeme.charAt(lexeme.length() - 2) == '"'
-                        && lexeme.charAt(lexeme.length() - 3) != '\\';
-                return result;
+                // Terminated lexeme must match regex: \"[!\n]*(?<!\\)\".
+                // Assumes lexeme already matches: \".*
+                return (lexeme.charAt(lexeme.length() - 3) != '\\'
+                        && lexeme.charAt(lexeme.length() - 2) == '"');
             }
         },
         MULTI
         {
-            @Override public boolean checkTerminated(String lexeme)
+            @Override public boolean _checkTerminated(String lexeme)
             {
-                final String truncated = lexeme.substring(0,
+                // Terminated lexeme must match regex: \"{3}\n.*(?<!\\)\"{3}.
+                // Assumes lexeme already matches: \"{3}\n.*
+                final String ending = lexeme.substring(lexeme.length() - 4,
                         lexeme.length() - 1);
-                final boolean result;
-                result = truncated.length() >= 7 && lexeme.endsWith("\"\"\"")
-                        && lexeme.charAt(lexeme.length() - 4) != '\\';
-                return result;
+                
+                return (lexeme.charAt(lexeme.length() - 5) != '\\'
+                        && ending.equals("\"\"\""));
             }
-        },
-        NONE
-        {
-            @Override public boolean checkTerminated(String lexeme)
-            { return false; }
         };
         
-        public static StringType getStringType(String lexeme)
+        public static final StringType getStringType(String lexeme)
+                throws IllegalArgumentException
         {
-            final StringType type;
+            final StringType result;
             
-            type = (lexeme.startsWith("\"\"\"\n")) ? MULTI
-                    : (lexeme.startsWith("\"")) ? SINGLE : NONE;
+            try
+            {
+                final String beginning = lexeme.substring(0, 3);
+                
+                if (lexeme.startsWith("\"\"\"\n")) result = MULTI;
+                else if (lexeme.startsWith("\"")) result = SINGLE;
+                else throw new IllegalArgumentException(
+                        "lexeme start invalid for type String");
+            }
+            catch (final IllegalArgumentException | IndexOutOfBoundsException e)
+            {
+                throw new IllegalArgumentException(
+                        "Could not find pattern for type String", e);
+            }
             
-            return type;
+            return result;
         }
         
-        public abstract boolean checkTerminated(String lexeme);
+        public abstract boolean _checkTerminated(String lexeme);
+        
+        public final boolean checkTerminated(String lexeme)
+                throws IllegalArgumentException
+        {
+            final boolean result;
+            
+            try
+            {
+                if (lexeme.length() > 2) result = _checkTerminated(lexeme);
+                else throw new IllegalArgumentException(
+                        "lexeme must be of at least length 3 to be terminated");
+            }
+            catch (final IllegalArgumentException | IndexOutOfBoundsException e)
+            {
+                throw new IllegalArgumentException(e);
+            }
+            
+            return result;
+        }
     }
+    
 }

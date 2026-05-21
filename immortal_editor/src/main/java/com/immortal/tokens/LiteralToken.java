@@ -1,10 +1,10 @@
 package com.immortal.tokens;
 
-public class LiteralToken extends Token
+public abstract class LiteralToken extends Token
 {
     private final TokenType type;
     private final String lexeme;
-    private final Object literal;
+    protected final Object literal;
     
     public LiteralToken(TokenType type, String lexeme, Object literal, int line)
     {
@@ -22,10 +22,27 @@ public class LiteralToken extends Token
     
     @Override public String toString()
     {
-        return this.line + " | " + this.type.toString() + this.lexeme
-                + this.literal.toString();
+        return "%d | %s %s %s".formatted(this.line, this.type, this.lexeme,
+                getLiteral());
     }
     
-    public Object getLiteral()
-    { return this.literal; }
+    public abstract Object getLiteral() throws LiteralRetrievalCastException;
+    
+    protected class LiteralRetrievalCastException
+            extends IllegalArgumentException
+    {
+        private static final String DEFAULT_MSG = "Underlying literal could not be retrieved";
+        
+        public LiteralRetrievalCastException()
+        { super(DEFAULT_MSG); }
+        
+        public LiteralRetrievalCastException(Throwable cause)
+        { super(DEFAULT_MSG, cause); }
+        
+        public LiteralRetrievalCastException(String msg)
+        { super(msg); }
+        
+        public LiteralRetrievalCastException(String msg, Throwable cause)
+        { super(msg, cause); }
+    }
 }

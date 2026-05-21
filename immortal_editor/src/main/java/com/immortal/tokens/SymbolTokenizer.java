@@ -6,6 +6,9 @@ public class SymbolTokenizer implements Tokenizer
             throws IllegalArgumentException
     {
         final KnownLexTokenType type = KnownLexTokenType.getTokenType(lexeme);
+        if (type == null || lexeme.length() > 2)
+            throw new IllegalArgumentException(
+                    "No known token found for lexeme");
         return new KnownLexToken(type, line);
     }
 }

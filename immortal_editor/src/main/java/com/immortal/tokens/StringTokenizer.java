@@ -3,8 +3,6 @@ package com.immortal.tokens;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.immortal.tokens.IdentifierLiteralTokenType.STR;
-
 public class StringTokenizer implements Tokenizer
 {
     private static final Pattern UNICODE_PATTERN = Pattern
@@ -14,7 +12,6 @@ public class StringTokenizer implements Tokenizer
             throws IllegalArgumentException
     {
         String literal = StringType.getStringType(lexeme).format(lexeme);
-        literal = literal.translateEscapes();
         
         final Matcher matcher = UNICODE_PATTERN.matcher(literal);
         
@@ -26,7 +23,9 @@ public class StringTokenizer implements Tokenizer
             return Character.toString(codePoint);
         });
         
-        final Token token = new LiteralToken(STR, lexeme, literal, line);
+        literal = literal.translateEscapes();
+        
+        final Token token = new StringToken(lexeme, literal, line);
         return token;
     }
     
