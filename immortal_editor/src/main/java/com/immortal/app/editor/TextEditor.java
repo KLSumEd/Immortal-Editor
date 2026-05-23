@@ -29,43 +29,65 @@ import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
+/**
+ * The main class for the Text Editor. Extends the {@link javax.swing.JFrame
+ * JFrame} class.
+ * 
+ * @author {@link https://github.com/KLSumEd KLSumEd}
+ * @see javax.swing.JFrame
+ */
 public final class TextEditor extends JFrame
 {
-    private static final JFrame frame = new JFrame(); // Main Editor Frame
+    private final JFrame frame = new JFrame(); // Main Editor Frame
     
     // Width of the main editor frame (px)
-    private static final int FRAME_WIDTH = 640;
+    private final int FRAME_WIDTH = 640;
     // Height of the main editor frame (px)
-    private static final int FRAME_HEIGHT = 480;
+    private final int FRAME_HEIGHT = 480;
     // Main editor frame text area
-    private static final JEditorPane main_editor_pane = new JEditorPane();
+    private final JEditorPane main_editor_pane = new JEditorPane();
     // Main editor menu-bar
-    private static final JMenuBar main_menu_bar = new JMenuBar();
+    private final JMenuBar main_menu_bar = new JMenuBar();
     
     // Main menu-bar 'file' submenu
-    private static final JMenu file_submenu = new JMenu("File");
+    private final JMenu file_submenu = new JMenu("File");
     
     // 'New' item in 'File' sumbmenu
-    private static final JMenuItem file_menuitem_new = new JMenuItem("New");
+    private final JMenuItem file_menuitem_new = new JMenuItem("New");
     // 'Open' item in 'File' sumbmenu
-    private static final JMenuItem file_menuitem_open = new JMenuItem("Open");
+    private final JMenuItem file_menuitem_open = new JMenuItem("Open");
     // 'Save' item in 'File' sumbmenu
-    private static final JMenuItem file_menuitem_save = new JMenuItem("Save");
+    private final JMenuItem file_menuitem_save = new JMenuItem("Save");
     // 'Save As' item in 'File' sumbmenu
-    private static final JMenuItem file_menuitem_saveas = new JMenuItem(
-            "Save As...");
+    private final JMenuItem file_menuitem_saveas = new JMenuItem("Save As...");
     // 'Quit' item in 'File' sumbmenu
-    private static final JMenuItem file_menuitem_quit = new JMenuItem("Quit");
+    private final JMenuItem file_menuitem_quit = new JMenuItem("Quit");
     
-    private static final JFileChooser jfc = new JFileChooser(
+    private final JFileChooser jfc = new JFileChooser(
             FileSystemView.getFileSystemView().getDefaultDirectory());
     private String filename = "untitled";
     private String absolute_filepath;
     private boolean modified = false;
     private EditorDocumentListener dl;
     
-    // Build the menu
-    static
+    /**
+     * Creates a new instance of the TextEditor.
+     * 
+     * @throws ClassNotFoundException          if the Editor cannot find the
+     *                                         {@link javax.swing.UIManager
+     *                                         UIManager}
+     * @throws InstantiationException          if the TextEditor cannot be
+     *                                         instantiated
+     * @throws IllegalAccessException          if the editor does not have
+     *                                         permissions to access the Look
+     *                                         And Feel
+     * @throws UnsupportedLookAndFeelException if the System Look And Feel is
+     *                                         unsupported by the
+     *                                         {@link javax.swing.UIManager
+     *                                         UIManager}
+     */
+    public TextEditor() throws ClassNotFoundException, InstantiationException,
+            IllegalAccessException, UnsupportedLookAndFeelException
     {
         
         try
@@ -117,15 +139,12 @@ public final class TextEditor extends JFrame
         jfc.setFileFilter(new FileNameExtensionFilter(
                 "Plain Text & Immortal Code Files", "txt", "imc"));
         jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        run();
     }
     
-    public TextEditor()
-    { run(); }
-    
-    // Final menu activation
-    public void run()
+    private void run()
     {
-        MenuBarActionListener mbl = new MenuBarActionListener();
+        final MenuBarActionListener mbl = new MenuBarActionListener();
         file_menuitem_new.addActionListener(mbl);
         file_menuitem_open.addActionListener(mbl);
         file_menuitem_save.addActionListener(mbl);
@@ -146,66 +165,87 @@ public final class TextEditor extends JFrame
         frame.setTitle(title);
     }
     
-    public void setDocumentModified()
+    private void setDocumentModified()
     {
         this.modified = true;
         setFrameTitle();
         main_editor_pane.getDocument().removeDocumentListener(this.dl);
     }
     
-    public void setDocumentUnmodified()
+    private void setDocumentUnmodified()
     {
         this.modified = false;
         setFrameTitle();
         main_editor_pane.getDocument().addDocumentListener(this.dl);
     }
     
+    /**
+     * Checks if the current document has been modified.
+     * 
+     * @return <code>true</code> if the document has been modified
+     */
     public boolean isModified()
     { return this.modified; }
     
-    public void refactorWindow(
-            String new_text, String new_absolute_filepath, String new_filename
+    private void refactorWindow(
+            final String text, final String absoluteFilePath,
+            final String fileName
     )
     {
         
-        if (new_text != null)
-        { main_editor_pane.setText(new_text); }
-        this.absolute_filepath = new_absolute_filepath;
-        this.filename = new_filename;
+        if (text != null)
+        { main_editor_pane.setText(text); }
+        this.absolute_filepath = absoluteFilePath;
+        this.filename = fileName;
         setDocumentUnmodified();
     }
     
+    /**
+     * Get the name of the currently open file
+     * 
+     * @return a <code>String</code> containing the name of the current file
+     */
     public String getFilename()
     { return this.filename; }
     
-    public void setFilename(String newFilename)
-    { this.filename = newFilename; }
-    
+    /**
+     * Get the absolute filepath of the currently opened file
+     * 
+     * @return a <code>String</code> containing the absolute filepath of the
+     *         current file
+     */
     public String getAbsoluteFilepath()
     { return this.absolute_filepath; }
     
-    public void setAbsoluteFilepath(String new_absolute_filepath)
-    { this.absolute_filepath = new_absolute_filepath; }
-    
     ///// NESTED CLASSES /////
     
-    // DocumentListener Adapter for main_editor_pane
-    class EditorDocumentListener implements DocumentListener
+    /**
+     * A {@link javax.swing.event.DocumentListener DocumentListener} Adapter for
+     * the mainEditorPane
+     * 
+     * @see javax.swing.event.DocumentListener
+     */
+    private class EditorDocumentListener implements DocumentListener
     {
-        @Override public void insertUpdate(DocumentEvent e)
+        @Override public void insertUpdate(final DocumentEvent e)
         { setDocumentModified(); }
         
-        @Override public void removeUpdate(DocumentEvent e)
+        @Override public void removeUpdate(final DocumentEvent e)
         { setDocumentModified(); }
         
-        @Override public void changedUpdate(DocumentEvent e)
+        @Override public void changedUpdate(final DocumentEvent e)
         {}
     }
     
-    // ActionListener Adapter for main_menu_bar
-    class MenuBarActionListener implements ActionListener
+    /**
+     * An {@link java.awt.event.ActionListener ActionListener} Adapter for the
+     * mainMenuBar
+     * 
+     * @see java.awt.event.ActionListener
+     */
+    private class MenuBarActionListener implements ActionListener
     {
-        @Override public void actionPerformed(ActionEvent e)
+        @Override public void actionPerformed(final ActionEvent e)
         {
             
             // Switch case to call appropriate event handler method
@@ -237,15 +277,15 @@ public final class TextEditor extends JFrame
             
             // Create & Show JFileChooser Open Dialog
             jfc.setDialogTitle("Choose file to open...");
-            int returnValue = jfc.showOpenDialog(file_menuitem_open);
+            final int returnValue = jfc.showOpenDialog(file_menuitem_open);
             
             // If user chose File to Open...
             if (returnValue == JFileChooser.APPROVE_OPTION)
             {
                 // Open Selected File
-                String new_absolute_filepath = jfc.getSelectedFile()
+                final String new_absolute_filepath = jfc.getSelectedFile()
                         .getAbsolutePath(); // Get filepath of selected file
-                File f = new File(new_absolute_filepath);
+                final File f = new File(new_absolute_filepath);
                 
                 // Read Selected File to Editor Pane
                 String ingest = ""; // Empty String to take file data
@@ -259,17 +299,17 @@ public final class TextEditor extends JFrame
                         
                         while (scan.hasNextLine())
                         {
-                            String line = scan.nextLine() + "\n";
+                            final String line = scan.nextLine() + "\n";
                             ingest = ingest + line;
                         }
                     }
                 }
-                catch (FileNotFoundException ex)
+                catch (final FileNotFoundException ex)
                 {
                     showErrorFileNotFound(file_menuitem_open);
                     return;
                 }
-                catch (IOException ex)
+                catch (final IOException ex)
                 {
                     showErrorIO(file_menuitem_open);
                     return;
@@ -281,7 +321,7 @@ public final class TextEditor extends JFrame
         }
         
         // Runs on Selecting main_menu_bar -> File -> Save / Save As...
-        private void onActionSave(boolean save_as)
+        private void onActionSave(final boolean save_as)
         {
             
             if (!isModified() && !save_as)
@@ -300,7 +340,8 @@ public final class TextEditor extends JFrame
                     jfc.setDialogTitle("Choose file save...");
                     
                     // Show Dialog and receive input
-                    int return_value = jfc.showSaveDialog(file_menuitem_save);
+                    final int return_value = jfc
+                            .showSaveDialog(file_menuitem_save);
                     
                     if (return_value != JFileChooser.APPROVE_OPTION)
                     { return; } // Return if the user doesn't wish to save
@@ -317,17 +358,17 @@ public final class TextEditor extends JFrame
                     out.write(main_editor_pane.getText());
                     refactorWindow(null, new_absolute_filepath, f.getName());
                 }
-                catch (FileNotFoundException ex)
+                catch (final FileNotFoundException ex)
                 {
                     showErrorFileNotFound(file_menuitem_save);
                 }
-                catch (IOException ex)
+                catch (final IOException ex)
                 {
                     showErrorIO(file_menuitem_save);
                 }
                 
             }
-            catch (NullPointerException ex)
+            catch (final NullPointerException ex)
             {
                 showErrorNullPointer(file_menuitem_save);
             }
@@ -358,8 +399,8 @@ public final class TextEditor extends JFrame
             final String TITLE = "Unsaved Changes";
             final String[] OPTIONS = { "Save", "Don't Save", "Cancel" };
             
-            int result = JOptionPane.showOptionDialog(main_menu_bar, MESSAGE,
-                    TITLE, JOptionPane.YES_NO_CANCEL_OPTION,
+            final int result = JOptionPane.showOptionDialog(main_menu_bar,
+                    MESSAGE, TITLE, JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, OPTIONS, OPTIONS[0]);
             
             switch (result)
@@ -377,7 +418,7 @@ public final class TextEditor extends JFrame
             return result;
         }
         
-        private void showErrorFileNotFound(Component root)
+        private void showErrorFileNotFound(final Component root)
         {
             final String MESSAGE = "Error! File not found.";
             final String TITLE = "FileNotFoundException";
@@ -385,7 +426,7 @@ public final class TextEditor extends JFrame
                     JOptionPane.ERROR_MESSAGE);
         }
         
-        private void showErrorIO(Component root)
+        private void showErrorIO(final Component root)
         {
             final String MESSAGE = "Error! An unknown IOException has occurred.";
             final String TITLE = "IOException";
@@ -393,7 +434,7 @@ public final class TextEditor extends JFrame
                     JOptionPane.ERROR_MESSAGE);
         }
         
-        private void showErrorNullPointer(Component root)
+        private void showErrorNullPointer(final Component root)
         {
             final String MESSAGE = "Error! No filepath was given.";
             final String TITLE = "NullPointerException";

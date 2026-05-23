@@ -12,10 +12,22 @@ import com.immortal.app.lex.ImmortalLexer;
 import com.immortal.app.lex.Lexer;
 import com.immortal.app.tokens.Token;
 
+/**
+ * Main class for the Compiler containing static methods for compiling files and
+ * running a REPL
+ * 
+ * @author KLSumEd
+ */
 public final class Compiler
 {
     private static boolean hadError = false;
     
+    /**
+     * Main method for running the compiler from the command line.
+     * 
+     * @param args command line args <em>(expected: file path)</em>
+     * @throws IOException if source cannot be read
+     */
     public static void main(String[] args) throws IOException
     {
         
@@ -73,6 +85,13 @@ public final class Compiler
         }
     }
     
+    /**
+     * Signals that an error occurred during the compilation process, then
+     * reports it.
+     * 
+     * @param line    the line in the source where the error occurred
+     * @param message a suitable error message
+     */
     public static void error(int line, String message)
     { report(line, "", message); }
     

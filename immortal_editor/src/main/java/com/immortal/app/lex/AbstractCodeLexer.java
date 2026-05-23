@@ -8,10 +8,28 @@ import com.immortal.app.scan.Scanner;
 import com.immortal.app.tokens.Token;
 import com.immortal.app.util.EnclosedPattern;
 
-public abstract class AbstractLexer implements Lexer
+/**
+ * <p>
+ * Provides an abstract implementation of the {@link Lexer} interface. The
+ * source reading functionality is provided by the
+ * {@link com.immortal.app.scan.Scanner Scanner} package. The implentation
+ * contains methods for performing lexical analysis on a
+ * <code>String source</code> and skipping both single- and multi-line comments.
+ * </p>
+ * 
+ * <p>
+ * To create a simple Lexer <em>(skipping Java-style comments:
+ * <code>// ... \n</code> & <code>/* ... {@literal *}/</code>)</em> the
+ * programmer need only implement the {@link #lexToken()} method and call the
+ * {@link #AbstractLexer(String) Super Constructor}
+ * </p>
+ * 
+ * @author {@link https://github.com/KLSumEd KLSumEd}
+ * @see
+ */
+public abstract class AbstractCodeLexer implements Lexer
 {
     /// ATTRIBUTES ///
-    
     protected final Scanner scanner;
     private final String comInitiatorSL;
     private final EnclosedPattern comPatternML;
@@ -19,7 +37,7 @@ public abstract class AbstractLexer implements Lexer
     
     /// CONSTRUCTORS ///
     
-    public AbstractLexer(
+    public AbstractCodeLexer(
             String source, String comInitiatorSL, EnclosedPattern comPatternML
     )
     {
@@ -28,14 +46,14 @@ public abstract class AbstractLexer implements Lexer
         this.comPatternML = EnclosedPattern.copyOf(comPatternML);
     }
     
-    public AbstractLexer(String source, String comInitiatorSL)
+    public AbstractCodeLexer(String source, String comInitiatorSL)
     {
         this.scanner = new Scanner(source);
         this.comInitiatorSL = comInitiatorSL;
         this.comPatternML = new EnclosedPattern("/*", "*/");
     }
     
-    public AbstractLexer(String source)
+    public AbstractCodeLexer(String source)
     {
         this.scanner = new Scanner(source);
         this.comInitiatorSL = "//";

@@ -7,7 +7,7 @@ import static com.immortal.app.lex.state.LexState.TERMINATED;
 import com.immortal.app.tokens.NullToken;
 import com.immortal.app.tokens.Token;
 
-public final class ImmortalLexer extends AbstractLexer
+public final class ImmortalLexer extends AbstractCodeLexer
 {
     private String errMsg = "";
     
