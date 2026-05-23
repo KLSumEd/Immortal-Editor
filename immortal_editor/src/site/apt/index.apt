@@ -1,0 +1,30 @@
+    ---
+    Immortal Engine
+    ---
+    KLSumEd
+    ---
+    ---
+
+Overview
+
+    'Immortal Engine' <(working title)> is a free, open-source application for playing, sharing, and creating 
+    VTTs <(Virtual Tabletops)> for any TTRPG <(Tabletop Roleplaying Game)>. We believe that TTRPGs should 
+    be accessible to everyone, and in the digital age this has never been easier. However, many facets of 
+    the TTRPG experience — NPCs, combat order, ability, GM tools, etc. — have been stuck 
+    firmly in <'pen and paper'>… until now!
+
+    The 'Immortal Engine' allows for the digital implementation of quite literally, any TTRPG feature!
+    We believe the TTRPG Space has always been carried by its community: from Local Game Stores, to
+    crowd-funding, and even simply getting a group of friends together to form your first party.
+    As such, our app is centred wholly around this philosophy.
+
+    Our 'Immortal Editor' <(working title)> allows Creators to model new or existing TTRPG systems
+    using a purpose-built modelling/scripting language (that is fully {{{https://en.wikipedia.org/wiki/Turing_completeness}Turing Complete}}).
+    These created 'model packages' can be shared online directly or using the app's built-in repository.
+    Players can then install these packages and run them through the Engine. 
+
+    For example, you could create a fully interactive Virtual Character Sheet that links to a party of other
+    players and a GM, that <also> links to a Battle Map! The Sky truly is the limit, all you need to do is 
+    download the model or build it yourself!
+
+    If you wish to install the latest version of the project, please refer to {{{https://github.com/KLSumEd/Immortal-Editor}the GitHub Repository}}.
