@@ -1,4 +1,4 @@
-package com.immortal.app.parse;
+package com.immortal.app.compiler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import com.immortal.app.lex.ImmortalLexer;
 import com.immortal.app.lex.Lexer;
 import com.immortal.app.tokens.Token;
 
-public class Parser
+public class Compiler
 {
     private static boolean hadError = false;
     
