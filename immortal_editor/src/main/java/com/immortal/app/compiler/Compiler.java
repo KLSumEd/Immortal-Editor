@@ -12,7 +12,7 @@ import com.immortal.app.lex.ImmortalLexer;
 import com.immortal.app.lex.Lexer;
 import com.immortal.app.tokens.Token;
 
-public class Compiler
+public final class Compiler
 {
     private static boolean hadError = false;
     
