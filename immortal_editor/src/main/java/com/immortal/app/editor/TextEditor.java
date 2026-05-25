@@ -33,7 +33,7 @@ import javax.swing.filechooser.FileSystemView;
  * The main class for the Text Editor. Extends the {@link javax.swing.JFrame
  * JFrame} class.
  * 
- * @author {@link https://github.com/KLSumEd KLSumEd}
+ * @author <a href="https://github.com/KLSumEd">KLSumEd</a>
  * @see javax.swing.JFrame
  */
 public final class TextEditor extends JFrame
